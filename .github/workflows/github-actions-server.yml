@@ -3,8 +3,12 @@ name: Node.js CI
 on:
   push:
     branches: [ master ]
+    paths:
+      - 'server/**'
   pull_request:
     branches: [ master ]
+    paths:
+      - 'server/**'
 
 jobs:
   build:
@@ -19,14 +23,18 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - run: cd ./server
       - name: install modules
+        working-directory: ./server
         run: npm install
       - name: build project
+        working-directory: ./server
         run: npm run build --if-present
       - name: unit test
+        working-directory: ./server
         run: npm run test
       - name: e2e test
+        working-directory: ./server
         run: npm run test:e2e
       - name: lint
+        working-directory: ./server
         run: npm run lint

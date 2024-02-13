@@ -41,7 +41,7 @@ model Product {
   title         String
   descirption   String
   discount      Int
-  image         String
+  images        String[]
   CaloryInfo    CaloryInfo
   ProductWeight Float
   price         Float
