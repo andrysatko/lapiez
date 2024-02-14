@@ -14,7 +14,7 @@ type CaloryInfo {
   Proteins       Float
   Carbohydrates  Float
   Fats           Float
-  CalorieContent Float
+  CalorieContent Float?
 }
 
 model Category {
@@ -39,8 +39,8 @@ model Type {
 model Product {
   id            String     @id @default(auto()) @map("_id") @db.ObjectId
   title         String
-  descirption   String
-  discount      Int
+  description   String
+  discount      Int?
   images        String[]
   CaloryInfo    CaloryInfo
   ProductWeight Float
