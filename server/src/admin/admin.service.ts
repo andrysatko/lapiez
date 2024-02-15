@@ -5,6 +5,8 @@ import * as uuid from 'uuid';
 import * as path from "path";
 import { createWriteStream } from 'fs';
 import {calculateCalories} from "./utils/CountCalories";
+
+import * as fs from "fs";
 @Injectable()
 export class AdminService {
     constructor(private productService: ProductService) {
@@ -17,15 +19,16 @@ export class AdminService {
         }
         const product = await this.productService.createProduct(body);
         if(!product){
-            throw new HttpException('Product not created', 500);
+            throw new HttpException('Problem while saving product in database', 500);
         }
         const filesName = [];
         files.map(file => {
             try {
-                const NewFileName = uuid.v4() + file.originalname + `.${file.mimetype.split('/')[1]}`;
-                file.stream.pipe(createWriteStream(path.join(process.cwd(),'static',NewFileName)));
+                const NewFileName = uuid.v4()  + `.${file.mimetype.split('/')[1]}`;
+                fs.writeFileSync(path.join(process.cwd(),'static','products',NewFileName), file.buffer);
                 filesName.push(NewFileName);
             }catch (e) {
+                console.log(e)
                 throw new HttpException('File not uploaded', 500);
             }
         })
