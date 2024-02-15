@@ -17,27 +17,32 @@ import {ApiProperty} from "@nestjs/swagger";
 import {ReferenceObject, SchemaObject} from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
 import {PartialType} from "@nestjs/mapped-types";
 class CalorySubClass {
+    @IsOptional()
     @IsNumber()
     @Min(0.01)
     @Max(1000)
     @ApiProperty()
-    Proteins:number;
+    Proteins?:number;
+    @IsOptional()
     @IsNumber()
     @Min(0.01)
     @Max(1000)
     @ApiProperty()
-    Carbohydrates:number;
+    Carbohydrates?:number;
+    @IsOptional()
     @IsNumber()
     @Min(0.01)
     @Max(1000)
     @ApiProperty()
-    Fats:number;
+    Fats?:number;
     @IsOptional()
     @IsNumber()
     @ApiProperty()
     CalorieContent?:number;
 }
-export class CreateProductDto implements Prisma.ProductUncheckedCreateInput {
+type TImplements =  Omit<Partial<Prisma.ProductUncheckedCreateInput>,'CaloryInfo'> & {CaloryInfo?: CalorySubClass};
+export class UpdateProductDto implements TImplements {
+    @IsOptional()
     @Transform(({value})=>{
         try {
             return JSON.parse(value);
@@ -48,16 +53,18 @@ export class CreateProductDto implements Prisma.ProductUncheckedCreateInput {
     @CustomValidateNested(CalorySubClass)
     @Type(() => CalorySubClass)
     @ApiProperty()
-    CaloryInfo: CalorySubClass;
+    CaloryInfo?: CalorySubClass;
+    @IsOptional()
     @Transform(({value}) => parseInt(value),{toClassOnly:true})
     @IsInt()
     @Max(3000)
     @Min(1)
     @ApiProperty()
-    ProductWeight: number;
+    ProductWeight?: number;
+    @IsOptional()
     @Length(1,300)
     @ApiProperty()
-    description: string;
+    description?: string;
     @IsOptional()
     @Transform(({value})=> Number(parseFloat(value).toFixed(2)),{toClassOnly:true})
     @IsNumber()
@@ -65,31 +72,34 @@ export class CreateProductDto implements Prisma.ProductUncheckedCreateInput {
     @Min(0.01)
     @ApiProperty()
     discount?: number | null;
+    @IsOptional()
     @Transform(({value}) => Number(parseFloat(value).toFixed(2)),{toClassOnly:true})
     @IsNumber()
     @Max(9999.9)
     @Min(0.01)
     @ApiProperty()
-    price: number;
+    price?: number;
+    @IsOptional()
     @Length(1,30)
     @ApiProperty()
-    title: string;
+    title?: string;
     @IsOptional()
     @IsMongoId()
     @ApiProperty()
     typeId?: string;
+    @IsOptional()
     @IsMongoId()
     @ApiProperty()
-    categoryId: string;
+    categoryId?: string;
 }
 
-export const  SchemaSwaggerCreateProductDto :  Record<keyof CreateProductDto, SchemaObject | ReferenceObject> = {
-    CaloryInfo: {type:'object',example:{"Proteins": 0, "Carbohydrates": 0, "Fats": 0, "CalorieContent": 0}, items:{properties:{Proteins:{type:'number'},Carbohydrates:{type:'number'},Fats:{type:'number'},CalorieContent:{type:'number'}}}},
-    ProductWeight: {type:'integer'},
-    categoryId: {type:'string'},
-    description: {type:'string'},
-    discount: {type:'float'},
-    price: {type:'float'},
-    title: {type:'string'},
-    typeId: {type:'string'}
+export const  SchemaSwaggerCreateProductDto :  Record<keyof UpdateProductDto, SchemaObject | ReferenceObject> = {
+    CaloryInfo: {type:'object', nullable:true, example:{"Proteins": 0, "Carbohydrates": 0, "Fats": 0, "CalorieContent": 0}, items:{properties:{Proteins:{type:'number', nullable:true},Carbohydrates:{type:'number', nullable:true},Fats:{type:'number', nullable:true},CalorieContent:{type:'number', nullable:true}}}},
+    ProductWeight: {type:'integer', nullable:true},
+    categoryId: {type:'string', nullable:true},
+    description: {type:'string', nullable:true},
+    discount: {type:'float', nullable:true},
+    price: {type:'float', nullable:true},
+    title: {type:'string', nullable:true},
+    typeId: {type:'string', nullable:true}
 }

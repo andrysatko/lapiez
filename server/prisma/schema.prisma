@@ -19,7 +19,8 @@ type CaloryInfo {
 
 model Category {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  title     String
+  title     String    @unique
+  icon      String    @unique
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   products  Product[]
@@ -37,7 +38,7 @@ model Type {
 }
 
 model Product {
-  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  id            String                 @id @default(auto()) @map("_id") @db.ObjectId
   title         String
   description   String
   discount      Int?
@@ -45,10 +46,83 @@ model Product {
   CaloryInfo    CaloryInfo
   ProductWeight Float
   price         Float
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  category      Category   @relation(fields: [categoryId], references: [id])
-  categoryId    String     @db.ObjectId
-  type          Type       @relation(fields: [typeId], references: [id])
-  typeId        String     @db.ObjectId
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+  category      Category               @relation(fields: [categoryId], references: [id])
+  categoryId    String                 @db.ObjectId
+  type          Type?                  @relation(fields: [typeId], references: [id])
+  typeId        String?                @db.ObjectId
+  additional    AdditionalIngirdient[]
+  TasteGoodWith TasteGoodWith[]
+}
+
+model AdditionalIngirdient {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  Product   Product  @relation(fields: [productId], references: [id])
+  productId String   @db.ObjectId
+  image     String
+  title     String
+  weight    Float
+  price     Float
+  maxAmount Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TasteGoodWith {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  Product   Product  @relation(fields: [productId], references: [id])
+  productId String   @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+type CartItem {
+  productId             String            @db.ObjectId
+  AdditionalIngirdients IngridientCount[]
+  count                 Int
+}
+
+type IngridientCount {
+  ingridientId String @db.ObjectId
+  count        Int
+}
+
+model Cart {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  CARD_DELIVERYMAN
+}
+
+model Order {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  items           CartItem[]
+  paymentMethod   PaymentMethod
+  Orendant_Name   String
+  Orendant_Phone  String
+  Orendant_City   String
+  Orendant_Street String // TODO: Add user previous delivery address
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model User {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  PhoneNumber String
+  password    String
+  createdAt   DateTime @default(now())
+}
+
+model Admin {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String   @unique
+  password  String
+  createdAt DateTime @default(now())
 }

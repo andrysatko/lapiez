@@ -28,26 +28,20 @@ export class ProductService {
     createProduct(body: Prisma.ProductUncheckedCreateInput){
         const {categoryId,typeId,...data} = body;
         return this.prisma.product.create({
-            data:{...data, category:{connect:{id:categoryId}}, type:{connect:{id:typeId}}}
+            data:{...data, category:categoryId ? {connect:{id:categoryId}} : undefined, type:typeId? {connect:{id:typeId}}: undefined}
         })
     }
-    updateProduct(id: string, data: Prisma.ProductUncheckedUpdateInput){
-        return this.prisma.product.update({
-            where:{id},
-            data
-        })
-    }
+    // updateProduct(id: string, body: Prisma.ProductUpdateInput){
+    //     const {categoryId,typeId,...data} = body;
+    //     return this.prisma.product.update({
+    //         where:{id},
+    //         data:{...data, category:categoryId ? {connect:{id:categoryId}} : undefined, type:typeId? {connect:{id:typeId}}: undefined}
+    //     })
+    // }
     createCategory(data: Prisma.CategoryUncheckedCreateInput){
-
-       const test =  this.prisma.product.findMany()
         return this.prisma.category.create({
-            data:{title:data.title}
+            data:{title:data.title, icon:data.icon}
         })
     }
-    createType(data: Prisma.TypeUncheckedCreateInput){
-        const {categoryId,...type} = data;
-        return this.prisma.type.create({
-            data:{...type, category:{connect:{id:data.categoryId}}},
-        })
-    }
+
 }

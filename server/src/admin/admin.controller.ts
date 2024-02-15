@@ -12,7 +12,7 @@ import {ReferenceObject, SchemaObject} from "@nestjs/swagger/dist/interfaces/ope
 @ApiTags('admin')
 @Controller('admin')
 export class AdminController {
-  constructor(private readonly adminService: AdminService, private readonly productService: ProductService) {}
+  constructor(private readonly adminService: AdminService) {}
 
   @Post('create-product')
   @ApiConsumes('multipart/form-data')
@@ -35,7 +35,7 @@ export class AdminController {
   @UseInterceptors(FilesInterceptor('files',2,))
   createProduct( @UploadedFiles(new ParseFilePipe({
     validators:[
-      new MaxFileSizeValidator({ maxSize: 100000 }),
+      new MaxFileSizeValidator({ maxSize: 1000000 }),
       new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
     ]
   })) files: Array<Express.Multer.File>,@Body() body: CreateProductDto) {
@@ -43,12 +43,34 @@ export class AdminController {
   }
 
   @Post('create_category')
-  createCategory(@Body() body: CreateCategoryDto){
-    return this.productService.createCategory(body);
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema:{
+      type: 'object',
+      properties:{
+        icon:{
+          type: 'file',
+          format: 'binary',
+        },
+        title:{
+          type: 'string',
+        }
+      }
+    }
+  })
+  @ApiResponse({ status: 201, description: 'The record has been successfully created.'})
+  @UseInterceptors(FileInterceptor('icon'))
+  createCategory(@UploadedFile(new ParseFilePipe({
+    validators:[
+      new MaxFileSizeValidator({ maxSize: 100000 }),
+      new FileTypeValidator({ fileType: '.(png|jpeg|jpg|svg)' }),
+    ]
+  })) icon: Express.Multer.File ,@Body() body: CreateCategoryDto){
+    return this.adminService.createCategory(icon,body);
   }
 
   @Post('create-type')
   createType(@Body() body: CreateTypeDto){
-    return this.productService.createType(body);
+    return this.adminService.createType(body);
   }
 }

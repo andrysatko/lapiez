@@ -17,8 +17,6 @@ export class PrismaService
     }
 
     async onModuleDestroy() {
-        console.log('database destroyed')
         await this.$disconnect();
     }
-
 }
