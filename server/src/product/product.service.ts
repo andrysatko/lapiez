@@ -6,6 +6,13 @@ export class ProductService {
     constructor(private readonly prisma: PrismaService){
     }
 
+    getTypes(){
+        return this.prisma.type.findMany();
+    }
+    getCategories(){
+        return this.prisma.category.findMany();
+    }
+
     getAll(){
         return this.prisma.product.findMany();
     }
@@ -24,24 +31,4 @@ export class ProductService {
             where:{typeId:typeId}
         })
     }
-
-    createProduct(body: Prisma.ProductUncheckedCreateInput){
-        const {categoryId,typeId,...data} = body;
-        return this.prisma.product.create({
-            data:{...data, category:categoryId ? {connect:{id:categoryId}} : undefined, type:typeId? {connect:{id:typeId}}: undefined}
-        })
-    }
-    // updateProduct(id: string, body: Prisma.ProductUpdateInput){
-    //     const {categoryId,typeId,...data} = body;
-    //     return this.prisma.product.update({
-    //         where:{id},
-    //         data:{...data, category:categoryId ? {connect:{id:categoryId}} : undefined, type:typeId? {connect:{id:typeId}}: undefined}
-    //     })
-    // }
-    createCategory(data: Prisma.CategoryUncheckedCreateInput){
-        return this.prisma.category.create({
-            data:{title:data.title, icon:data.icon}
-        })
-    }
-
 }

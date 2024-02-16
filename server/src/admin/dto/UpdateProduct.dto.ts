@@ -93,7 +93,7 @@ export class UpdateProductDto implements TImplements {
     categoryId?: string;
 }
 
-export const  SchemaSwaggerCreateProductDto :  Record<keyof UpdateProductDto, SchemaObject | ReferenceObject> = {
+export const  SchemaSwaggerUpdateProductDto :  Record<keyof UpdateProductDto, SchemaObject | ReferenceObject> = {
     CaloryInfo: {type:'object', nullable:true, example:{"Proteins": 0, "Carbohydrates": 0, "Fats": 0, "CalorieContent": 0}, items:{properties:{Proteins:{type:'number', nullable:true},Carbohydrates:{type:'number', nullable:true},Fats:{type:'number', nullable:true},CalorieContent:{type:'number', nullable:true}}}},
     ProductWeight: {type:'integer', nullable:true},
     categoryId: {type:'string', nullable:true},

@@ -17,6 +17,7 @@ import { DatabaseModule } from './database/database.module';
     DatabaseModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'static'),
+      serveRoot: '/static',
     }),
     AuthModule,
     ProductModule,
