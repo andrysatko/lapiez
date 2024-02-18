@@ -9,6 +9,7 @@ import {UpdateProductDto} from "./dto/UpdateProduct.dto";
 import {PrismaService} from "../database/prisma.service";
 import {Prisma} from "@prisma/client";
 import {UpdateCategoryDto} from "./dto/UpdateCategory.dto";
+import {UpdateTypeDto} from "./dto/UpdateType.dto";
 
 @Injectable()
 export class AdminService {
@@ -49,7 +50,7 @@ export class AdminService {
         if(!product) throw new HttpException('Product not found', 404);
         const OldFilesNames = product.images;
         const filesNames = [];
-        if(files){
+        if(files && files.length > 0){
             const filePath = path.join(process.cwd(),'static','products')
             try {
                 files.map(file =>{
@@ -76,18 +77,19 @@ export class AdminService {
         const product = await this.prismaService.product.findUnique({where:{id:productId}});
         if(!product) throw new HttpException('Product not found', 404);
         const filePath = path.join(process.cwd(),'static','products');
-        try{product.images.map(file => fs.unlinkSync(path.join(filePath, file)))}
-        finally {
-            await this.prismaService.product.delete({where:{id:productId}})
-        }
+        product.images.map(file => fs.unlink(path.join(filePath, file),()=>{}))
+        await this.prismaService.product.delete({where:{id:productId}})
     }
 
-    async UpdateOneImageProduct(productId: string, file: Express.Multer.File, oldFileName: string){
+    async UpdateOneImageProduct(productId: string, oldFileName: string ,  file: Express.Multer.File) {
         const product = await this.prismaService.product.findUnique({where:{id:productId}});
         if(!product) throw new HttpException('Product not found', 404);
         if(!product.images.includes(oldFileName)) throw new BadRequestException(`Porovided image name ${oldFileName} not found in product images`);
-        const filePath = path.join(process.cwd(),'static','products',oldFileName);
-        fs.writeFileSync(filePath, file.buffer);
+        const filePath = path.join(process.cwd(),'static','products');
+        const NewFileName = uuid.v4()  + `.${file.mimetype.split('/')[1]}`;
+        fs.writeFileSync(path.join(filePath, NewFileName), file.buffer);
+        fs.unlinkSync(path.join(filePath, oldFileName));
+        return this.prismaService.product.update({where:{id:productId}, data: {images: {set: product.images.map(fileName=> fileName === oldFileName ? NewFileName : fileName)}}})
     }
 
     async createCategory(icon: Express.Multer.File,body : CreateCategoryDto ){
@@ -129,7 +131,7 @@ export class AdminService {
         if(!category) throw new HttpException('Category not found', 404);
         const filePath = path.join(process.cwd(),'static','categories',category.icon);
         await this.prismaService.category.delete({where:{id:categoryId}});
-        fs.unlinkSync(filePath);
+        fs.unlink(filePath,()=>{});
     }
     async createType(data: Prisma.TypeUncheckedCreateInput){
         const {categoryId,...type} = data;
@@ -138,10 +140,10 @@ export class AdminService {
         })
     }
 
-    async UpdateType(typeId: string, title:string){
+    async UpdateType(typeId: string, body: UpdateTypeDto){
         const type = await this.prismaService.type.findUnique({where:{id:typeId}});
         if(!type) throw new HttpException('Type not found', 404);
-        return this.prismaService.type.update({where:{id:typeId},data:{title}})
+        return this.prismaService.type.update({where:{id:typeId},data:body})
     }
 
     async DeleteType(typeId: string){

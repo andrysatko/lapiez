@@ -54,12 +54,13 @@ export class UpdateProductDto implements TImplements {
     @Type(() => CalorySubClass)
     @ApiProperty()
     CaloryInfo?: CalorySubClass;
-    @IsOptional()
+
     @Transform(({value}) => parseInt(value),{toClassOnly:true})
     @IsInt()
     @Max(3000)
     @Min(1)
     @ApiProperty()
+    @IsOptional()
     ProductWeight?: number;
     @IsOptional()
     @Length(1,300)
