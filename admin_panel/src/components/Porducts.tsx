@@ -7,6 +7,14 @@ import {ConfigProvider, List} from "antd";
 function AllProducdts(){
     const [data, setData] = useState<Product[]>()
     const [isLoading, setLoading] = useState(true)
+    const handleChangeProduct = (product: Product, oldId: string) => {
+        const index = data?.findIndex((item) => item.id === oldId);
+        index && setData((prev) => {
+            let newData = prev!;
+            newData[index] = product;
+            return newData;
+        })
+    }
     useEffect(()=>{
         const url = host + Endpoints.AllProducts;
         fetch(url, { cache: 'no-store' })
@@ -25,6 +33,13 @@ function AllProducdts(){
                     itemSize: 50,
                     colorSplit: '#fcb103',
                 },
+                Modal: {
+                    titleFontSize: 20,
+                    titleColor: '#d18502',
+                },
+                Button: {
+                    defaultActiveColor: '#f2e63a',
+                },
             },
         }}>
         <List
@@ -38,8 +53,7 @@ function AllProducdts(){
             dataSource={data}
             bordered={true}
             split={true}
-
-            renderItem={(item) => <Porudct {...item} />}
+            renderItem={(item) => <Porudct {...item} ResetProduct={handleChangeProduct} />}
         >
         </List>
     </ConfigProvider>
