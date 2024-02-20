@@ -67,23 +67,7 @@ function AllProducdts(){
     if (isLoading) return <p>Loading...</p>
     if (!data) return <p>No profile data</p>
     return (
-        <ConfigProvider theme={{
-            components: {
-                Pagination: {
-                    colorPrimary: '#fcb103',
-                    colorPrimaryHover: '#b59205',
-                    itemSize: 50,
-                    colorSplit: '#fcb103',
-                },
-                Modal: {
-                    titleFontSize: 20,
-                    titleColor: '#d18502',
-                },
-                Button: {
-                    defaultActiveColor: '#f2e63a',
-                },
-            },
-        }}>
+        <div>
                 <List
                 itemLayout="vertical"
                 size="large"
@@ -99,7 +83,7 @@ function AllProducdts(){
             >
             </List>
             {editingProduct && <EditProductForm product={editingProduct} CloseEditForm={HandleEditCloseButton} />}
-    </ConfigProvider>
+        </div>
     )
 }
 

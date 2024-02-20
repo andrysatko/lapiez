@@ -1,7 +1,7 @@
 'use client'
 import React from 'react';
 import { UploadOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';
-import { Layout, Menu, theme } from 'antd';
+import {ConfigProvider, Layout, Menu, theme} from 'antd';
 import Image from 'next/image';
 import LogoText from '../../public/logo-normalna.svg'
 import DashboardImage from '../../public/layer groupdashboard.svg'
@@ -12,7 +12,12 @@ import ExistIcon from '../../public/exit-svgrepo-com.svg'
 import CartIcon from '../../public/cart-shopping-svgrepo-com.svg'
 import { Divider } from 'antd';
 import {AllProducdts} from "@/components/Porducts";
+import { Comfortaa } from '@next/font/google';
 import TetList from "@/components/testlist";
+const confortaa = Comfortaa({
+    subsets: ["latin","cyrillic","cyrillic-ext"],
+});
+
 const { Header, Content, Footer, Sider } = Layout;
 
 
@@ -36,7 +41,28 @@ export default function Home() {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
   return (
-      <Layout>
+      <main className={confortaa.className}>
+          <ConfigProvider theme={{
+              token: {
+                  fontFamily: 'Comfortaa',
+              },
+              components: {
+                  Pagination: {
+                      colorPrimary: '#fcb103',
+                      colorPrimaryHover: '#b59205',
+                      itemSize: 50,
+                      colorSplit: '#fcb103',
+                  },
+                  Modal: {
+                      titleFontSize: 20,
+                      titleColor: '#d18502',
+                  },
+                  Button: {
+                      defaultActiveColor: '#f2e63a',
+                  },
+              },
+          }}>
+      <Layout className={confortaa.className}>
           <Sider style={{ background: colorBgContainer, zIndex: 999 }}
               breakpoint="lg"
               collapsedWidth="0"
@@ -67,7 +93,7 @@ export default function Home() {
 
 
           <Layout>
-              <Header style={{ padding: 0, background: colorBgContainer, height:  128,zIndex: 999}} className="sticky top-0" />
+              <Header style={{ padding: 0, background: colorBgContainer, height:  90,zIndex: 999}} className="sticky top-0" />
               <Content style={{ margin: '24px 16px 0' }}>
                   <div
                       style={{
@@ -83,5 +109,7 @@ export default function Home() {
               </Content>
           </Layout>
       </Layout>
+          </ConfigProvider>
+      </main>
   );
 }
