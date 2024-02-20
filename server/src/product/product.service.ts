@@ -14,7 +14,9 @@ export class ProductService {
     }
 
     getAll(){
-        return this.prisma.product.findMany();
+        const data =this.prisma.product.findMany({include:{type:true,category:true}});
+        console.log(data);
+        return data;
     }
     getById(id: string){
         return this.prisma.product.findUnique({

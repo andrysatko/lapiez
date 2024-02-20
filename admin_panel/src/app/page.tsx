@@ -37,7 +37,7 @@ export default function Home() {
     } = theme.useToken();
   return (
       <Layout>
-          <Sider style={{ background: colorBgContainer }}
+          <Sider style={{ background: colorBgContainer, zIndex: 999 }}
               breakpoint="lg"
               collapsedWidth="0"
               onBreakpoint={(broken) => {
@@ -50,6 +50,7 @@ export default function Home() {
                     console.log(e);
               }}
           >
+              <div className="sticky top-0">
               <div className="h-28 w-full flex flex-col" style={{paddingLeft:24}}>
                   <div className="bg-amber-300 rounded-2xl p-2 w-2/3 h-1/2" style={{marginTop:20}}>
                       <Image src={LogoText} objectFit="contain"  alt="svg logo text"></Image>
@@ -61,11 +62,12 @@ export default function Home() {
               </div>
               <Divider />
               <Menu theme="light" mode="inline" defaultSelectedKeys={['4']} items={items} />
+              </div>
           </Sider>
 
 
           <Layout>
-              <Header style={{ padding: 0, background: colorBgContainer, height:  128}} />
+              <Header style={{ padding: 0, background: colorBgContainer, height:  128,zIndex: 999}} className="sticky top-0" />
               <Content style={{ margin: '24px 16px 0' }}>
                   <div
                       style={{

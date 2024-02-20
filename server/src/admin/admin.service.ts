@@ -36,10 +36,12 @@ export class AdminService {
         })
         try {
             const {categoryId,typeId,...data} = body;
+            console.log(categoryId, typeId)
             return await this.prismaService.product.create({
                 data:{...data, images:filesNames, category:categoryId ? {connect:{id:categoryId}} : undefined, type:typeId? {connect:{id:typeId}}: undefined}
             })
         }catch (e) {
+            console.log(e)
             removeFiles();
             throw new HttpException('Problem while saving product in database', 500);
         }

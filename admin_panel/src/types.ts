@@ -14,6 +14,22 @@ type Product = {
         Fats: number
         CalorieContent: number | null
     }
+    "createdAt": string,
+    "updatedAt": string,
+    "category": {
+        "id": string,
+        "title": string,
+        "icon": string,
+        "createdAt": string,
+        "updatedAt": string
+    }
+    "type"?: {
+        "id": string,
+        "title": string,
+        "createdAt": string,
+        "updatedAt": string,
+        "categoryId": string
+    },
 }
 
 export type { Product }
