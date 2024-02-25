@@ -16,6 +16,30 @@ import {BadRequestException} from "@nestjs/common";
 import {ApiProperty} from "@nestjs/swagger";
 import {ReferenceObject, SchemaObject} from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
 import {PartialType} from "@nestjs/mapped-types";
+
+class ReplaceItem {
+    @IsNumber()
+    index: number;
+
+    @IsString()
+    fileName: string;
+}
+class NewImages {
+    @IsOptional()
+    @IsArray()
+    @ArrayNotEmpty()
+    @ValidateNested({ each: true })
+    @Type(() => ReplaceItem)
+    replace?: ReplaceItem[];
+    @IsOptional()
+    @IsArray()
+    @IsString({each:true})
+    push?: string[];
+    @IsOptional()
+    @IsArray()
+    @IsString({each:true})
+    remove?: number[];
+}
 class CalorySubClass {
     @IsOptional()
     @IsNumber()
@@ -54,7 +78,6 @@ export class UpdateProductDto implements TImplements {
     @Type(() => CalorySubClass)
     @ApiProperty()
     CaloryInfo?: CalorySubClass;
-
     @Transform(({value}) => parseInt(value),{toClassOnly:true})
     @IsInt()
     @Max(3000)
@@ -83,7 +106,7 @@ export class UpdateProductDto implements TImplements {
     @IsOptional()
     @Length(1,30)
     @ApiProperty()
-    title?: string;
+    title?: string;@CustomValidateNested(CalorySubClass)
     @IsOptional()
     @IsMongoId()
     @ApiProperty()
@@ -92,10 +115,25 @@ export class UpdateProductDto implements TImplements {
     @IsMongoId()
     @ApiProperty()
     categoryId?: string;
+
+
+    @IsOptional()
+    @Transform(({value})=>{
+        try {
+            return JSON.parse(value);
+        } catch (error) {
+            throw new BadRequestException('' + error.message);
+        }
+    })
+    @CustomValidateNested(NewImages)
+    @Type(() => NewImages)
+    FileData?: NewImages;
 }
+
 
 export const  SchemaSwaggerUpdateProductDto :  Record<keyof UpdateProductDto, SchemaObject | ReferenceObject> = {
     CaloryInfo: {type:'object', nullable:true, example:{"Proteins": 0, "Carbohydrates": 0, "Fats": 0, "CalorieContent": 0}, items:{properties:{Proteins:{type:'number', nullable:true},Carbohydrates:{type:'number', nullable:true},Fats:{type:'number', nullable:true},CalorieContent:{type:'number', nullable:true}}}},
+    FileData:{type:'object', nullable:true, example:{"replace":[{"index": 0, "fileName": "string"}], "push": ["string"], "remove":["integer"]}, items:{properties:{replace:{type:'array', items:{properties:{index:{type:'number', nullable:true},fileName:{type:'string', nullable:true}}}}, push:{type:'array', items:{type:'string', nullable:true} }, remove:{type:'array', items:{type:'integer', nullable:true}}}}},
     ProductWeight: {type:'integer', nullable:true},
     categoryId: {type:'string', nullable:true},
     description: {type:'string', nullable:true},

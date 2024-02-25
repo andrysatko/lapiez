@@ -47,27 +47,52 @@ export class AdminService {
         }
     }
     async UpdateProduct(product_Id: string,body: UpdateProductDto,files?: Express.Multer.File[] | undefined){
-        const {CaloryInfo , ...rest} = body;
+        const MaxAvailableFiles = 3;
+        const {CaloryInfo , FileData, ...rest} = body;
         const product = await this.prismaService.product.findUnique({where:{id:product_Id}});
         if(!product) throw new HttpException('Product not found', 404);
-        const OldFilesNames = product.images;
-        const filesNames = [];
+        const FilesNames = product.images;
         if(files && files.length > 0){
-            const filePath = path.join(process.cwd(),'static','products')
             try {
-                files.map(file =>{
-                    const NewFileName = uuid.v4()  + `.${file.mimetype.split('/')[1]}`;
-                    fs.writeFileSync(path.join(filePath, NewFileName),  file.buffer);
-                    filesNames.push(NewFileName);
+            if(!FileData){
+                throw new BadRequestException('FileData should be provided for uploaded files');
+            }
+            const filePath = path.join(process.cwd(),'static','products')
+            if(FileData.replace){
+                FileData.replace.map(replaceItem =>{
+                    if(replaceItem.index < 0 || replaceItem.index > FilesNames.length) throw new BadRequestException(`Index ${replaceItem.index} out of range`);
+                    const NewFileName = uuid.v4()  + `.${files[replaceItem.index].mimetype.split('/')[1]}`;
+                    fs.writeFileSync(path.join(filePath, NewFileName),  files[replaceItem.index].buffer);
+                    const unlinkPath = path.join(filePath, FilesNames[replaceItem.index])
+                    if(fs.existsSync(unlinkPath)){
+                        fs.unlinkSync(unlinkPath)
+                    }
+                    FilesNames[replaceItem.index] = NewFileName;
                 })
+            }
+            if(FileData.remove){
+                FileData.remove.map(index => {
+                    if(index < 0 || index > FilesNames.length) throw new BadRequestException(`Index ${index} out of range`);
+                    const unlinkPath = path.join(filePath, FilesNames[index])
+                    if(fs.existsSync(unlinkPath)){
+                        fs.unlinkSync(unlinkPath)
+                    }
+                    FilesNames.splice(index,1);
+                })
+            }
+            if(FileData.push){
+                if(FilesNames.length + FileData.push.length > MaxAvailableFiles) throw new BadRequestException(`Max available files is ${MaxAvailableFiles}`);
+                FileData.push.map((file,index) =>{
+                    const NewFileName = uuid.v4()  + `.${files[index].mimetype.split('/')[1]}`;
+                    fs.writeFileSync(path.join(filePath, NewFileName),  files[index].buffer);
+                    FilesNames.push(NewFileName);
+                })
+            }
                 const updatedProduct =await this.prismaService.product.update({where:{id:product_Id},data:{CaloryInfo:{...product.CaloryInfo, ...CaloryInfo},
                         ...rest,
-                        images:filesNames
+                        images:FilesNames
                     }})
-                OldFilesNames.map(file => fs.unlinkSync(path.join(filePath, file)))
-                return updatedProduct;
             }catch (e) {
-                filesNames.map(file => fs.unlinkSync(path.join(filePath, file)));
                 throw new HttpException('Problem while saving product in database', 500);
             }
         }

@@ -31,5 +31,8 @@ type Product = {
         "categoryId": string
     },
 }
+type CategorySTypes = {types: {id: string, title: string, createdAt: Date, updatedAt: Date, categoryId: string}[]  ,id: string, title: string, icon: string, createdAt: Date, updatedAt: Date}
+type AllCategories = CategorySTypes[]
+type ProductFormData = Pick<Product, "title" | "description" | "discount" | "ProductWeight" | "price" | "categoryId" | "typeId"| "CaloryInfo"> & {Images: File[]} & {oldImages? : string[]}
 
-export type { Product }
+export type { Product ,AllCategories , ProductFormData}

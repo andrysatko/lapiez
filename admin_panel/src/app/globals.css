@@ -11,10 +11,6 @@
   }
 }
 
-body {
-  font-family: 'Comfortaa', sans-serif;
-}
-
 @layer base {
   .font-outline-1 {
     -webkit-text-stroke: 1px black;
@@ -27,5 +23,27 @@ body {
   }
   .border-1 {
     border-width: 1px;
+  }
+}
+
+.sider {
+  width: 80%;
+}
+
+@media (min-width: 1024px) {
+  .sider {
+    width: 50%;
+  }
+}
+
+@media (min-width: 1280px) {
+  .sider {
+    width: 33.33%;
+  }
+}
+
+@media (min-width: 1536px) {
+  .sider {
+    width: 25%;
   }
 }

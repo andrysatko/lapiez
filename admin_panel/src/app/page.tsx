@@ -14,102 +14,20 @@ import { Divider } from 'antd';
 import {AllProducdts} from "@/components/Porducts";
 import { Comfortaa } from '@next/font/google';
 import TetList from "@/components/testlist";
+import './globals.css'
+import useWindowDimensions from "@/hook/useWindowDimensions";
+import {CountSiderWidth} from "@/utils/CountSiderWidth";
 const confortaa = Comfortaa({
     subsets: ["latin","cyrillic","cyrillic-ext"],
 });
-
 const { Header, Content, Footer, Sider } = Layout;
 
-
-
 export default function Home() {
-    const [visibleComponent , setVisibleComponent] = React.useState("default");
-
-
-    const items  = [{src: ProductIcon , title : "Products"} , {src: UsersIcon , title: "Users"} , {src : DeliveryIcon, title: "Delivery"}, {src: CartIcon, title: "Cart"}, {src: ExistIcon, title: "Exit"}, ].map(
-        (item, index) => ({
-            key: String(index + 1),
-            icon: <div><Image src={item.src} width={20} height={20} alt={item.title}/></div>,
-            label: `${item.title}`,
-            onClick: () => {
-                setVisibleComponent(item.title)
-            }
-        }),
-    );
-
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
   return (
       <main className={confortaa.className}>
-          <ConfigProvider theme={{
-              token: {
-                  fontFamily: 'Comfortaa',
-              },
-              components: {
-                  Pagination: {
-                      colorPrimary: '#fcb103',
-                      colorPrimaryHover: '#b59205',
-                      itemSize: 50,
-                      colorSplit: '#fcb103',
-                  },
-                  Modal: {
-                      titleFontSize: 20,
-                      titleColor: '#d18502',
-                  },
-                  Button: {
-                      defaultActiveColor: '#f2e63a',
-                  },
-              },
-          }}>
-      <Layout className={confortaa.className}>
-          <Sider style={{ background: colorBgContainer, zIndex: 999 }}
-              breakpoint="lg"
-              collapsedWidth="0"
-              onBreakpoint={(broken) => {
-                  console.log(broken);
-              }}
-              onCollapse={(collapsed, type) => {
-                  console.log(collapsed, type);
-              }}
-              onAbort={(e) => {
-                    console.log(e);
-              }}
-          >
-              <div className="sticky top-0">
-              <div className="h-28 w-full flex flex-col" style={{paddingLeft:24}}>
-                  <div className="bg-amber-300 rounded-2xl p-2 w-2/3 h-1/2" style={{marginTop:20}}>
-                      <Image src={LogoText} objectFit="contain"  alt="svg logo text"></Image>
-                  </div>
-                  <div className="flex flex-row  mt-7 h-1/2">
-                      <Image src={DashboardImage} objectFit="contain" alt={"dashboard"}/>
-                      <h1 className=" font-bold text-lg flex items-center justify-center h-full text-center text-amber-500 text-[100%]">Dashboard</h1>
-                  </div>
-              </div>
-              <Divider />
-              <Menu theme="light" mode="inline" defaultSelectedKeys={['4']} items={items} />
-              </div>
-          </Sider>
-
-
-          <Layout>
-              <Header style={{ padding: 0, background: colorBgContainer, height:  90,zIndex: 999}} className="sticky top-0" />
-              <Content style={{ margin: '24px 16px 0' }}>
-                  <div
-                      style={{
-                          padding: 24,
-                          minHeight: 360,
-                          background: colorBgContainer,
-                          borderRadius: borderRadiusLG,
-                      }}
-                  >
-                      {visibleComponent}
-                      {visibleComponent === "Products" && <AllProducdts/>}
-                  </div>
-              </Content>
-          </Layout>
-      </Layout>
-          </ConfigProvider>
       </main>
   );
 }

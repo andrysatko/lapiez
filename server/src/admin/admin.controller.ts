@@ -46,7 +46,7 @@ export class AdminController {
   @UseInterceptors(FilesInterceptor('files',2,))
   createProduct(@UploadedFiles(new ParseFilePipe({
     validators:[
-      new MaxFileSizeValidator({ maxSize: 1000000 }),
+      new MaxFileSizeValidator({ maxSize: 10000000 }),
       new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
     ]
   })) files: Array<Express.Multer.File>,@Body() body: CreateProductDto) {

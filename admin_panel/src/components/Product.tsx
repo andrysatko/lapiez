@@ -5,11 +5,9 @@ import {host, Endpoints, staticDir} from "@/constants"
 import NImage from "next/image";
 import WeightIcon from "../../public/weight.svg";
 import EditIcon from "../../public/edit.svg";
+import Link from "next/link";
 
-type Props = {
-    EditButtonClick: (product: Product) => void
-}
-export default function Porudct ({ EditButtonClick,...product}: Product & Props){
+export default function Porudct ({ ...product}: Product ){
     const {id, title, description , discount , images, ProductWeight ,price , categoryId , typeId, CaloryInfo ,category, type} = product;
     return (
         <List.Item style={{marginTop: 20, borderBottom: "1px solid #fcb103"}}>
@@ -50,13 +48,15 @@ export default function Porudct ({ EditButtonClick,...product}: Product & Props)
                 <h2 className="font-semibold text-sm">Type: <span className="text-orange text-xs">{type?.title ?? "NULL"}</span> , type_id: <span className="text-orange text-xs"> {typeId ?? "NULL"}</span></h2>
             </Flex>
             <Flex style={{paddingTop:20}} gap="large" wrap="wrap">
-            <Button
-                type="primary"
-                icon={<NImage src={EditIcon} alt="edit" width={20} height={20}/>}
-                onClick={() => EditButtonClick(product)}
-            >
-                Edit product
-            </Button>
+                <Link href={`/products/edit/${id}`}>
+                    <Button
+                        icon={<div className="w-5 h-4">
+                            <NImage src={EditIcon} alt="edit"/>
+                        </div>}
+                    >
+                        Edit product
+                    </Button>
+                </Link>
             <Button
                 type="primary"
                 danger
@@ -71,7 +71,7 @@ export default function Porudct ({ EditButtonClick,...product}: Product & Props)
 function CaloryCell({title,value}: {title: string, value: string}){
     return (
         <div className="flex flex-col">
-            <h3 className="font-normal text-sm">{title}</h3>
+            <h3 className="font-normal text-xs">{title}</h3>
             <h3 className="font font-semibold text-sm mt-1 text-center">{value}</h3>
         </div>
     )

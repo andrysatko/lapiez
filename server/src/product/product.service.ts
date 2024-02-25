@@ -33,4 +33,15 @@ export class ProductService {
             where:{typeId:typeId}
         })
     }
+
+    getAllCategoriesAndTypes(){
+        return this.prisma.category.findMany({include:{types:true}});
+    }
+
+    getProductById(id: string){
+        return this.prisma.product.findUnique({
+            where: {id:id},
+            include: {type:true, category:true}
+        });
+    }
 }
