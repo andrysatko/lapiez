@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import { PlusOutlined } from '@ant-design/icons';
 import {Button, Form, Modal, Upload} from 'antd';
 import type { GetProp, UploadFile, UploadProps } from 'antd';
-import {Product} from "@/types";
+import {Product, UpdateFileData} from "@/types";
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
@@ -14,14 +14,14 @@ const getBase64 = (file: FileType): Promise<string> =>
         reader.onerror = (error) => reject(error);
     });
 
-const FileUpload= ({images, setFiles}: {images?: Product["images"] , setFiles: (file:File[])=> void}) => {
+const FileUpload= ({oldImages, setFiles}: {oldImages?: Product["images"] , setFiles: (file:File[],FileData?: UpdateFileData)=> void}) => {
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [previewTitle, setPreviewTitle] = useState('');
     const [filesView, setFilesView] = useState<UploadFile[]>([]);
     useEffect(()=>{
-        if (images && images.length > 0){
-            const OldFiles = images.map((image,index)=>{
+        if (oldImages && oldImages.length > 0){
+            const OldFiles = oldImages.map((image, index)=>{
                 return {
                     uid: String(index),
                     name: image,
@@ -31,7 +31,7 @@ const FileUpload= ({images, setFiles}: {images?: Product["images"] , setFiles: (
             })
             setFilesView(OldFiles as any)
         }
-    },[images])
+    },[oldImages])
     const handleCancel = () => setPreviewOpen(false);
 
     const handlePreview = async (file: UploadFile) => {
@@ -45,12 +45,44 @@ const FileUpload= ({images, setFiles}: {images?: Product["images"] , setFiles: (
     };
 
     const handleChange: UploadProps['onChange'] = ({ fileList }) => {
-        const filesBlob = fileList.map(fileListItem =>{
-            return fileListItem.originFileObj as File
-        })
-        setFilesView(fileList);
-        setFiles(filesBlob);
+        const filesBlob: File[] = [];
+        if(oldImages && oldImages.length>0){
+            const fileData: UpdateFileData = {};
+            for(let index = 0 ; index <  fileList.length ; index++){
+                if(fileList[index].originFileObj){
+                    filesBlob.push(fileList[index].originFileObj as File);
+                    if(oldImages[index] &&  oldImages[index] !== fileList[index].name){
+                     fileData.replace = fileData.replace ? [...fileData.replace, {fileName:fileList[index].name, index}] : [{fileName: fileList[index].name, index}];
+                    }
+                    if(!oldImages[index]){
+                        fileData.push = fileData.push ? [...fileData.push, fileList[index].name] : [fileList[index].name];
+                    }
+                }
+            }
+            if(fileList.length < oldImages.length){
+                oldImages.map((image, index)=>{
+                if(!fileList[index]){
+                        fileData.remove = fileData.remove ? [...fileData.remove, index] : [index];
+                    }
+                })
+            }
+            setFilesView(fileList);
+            setFiles(filesBlob, fileData);
+        }else{
+            fileList.filter(FILES => FILES.originFileObj).map(fileListItem =>{
+                filesBlob.push(fileListItem.originFileObj as File);
+            })
+            setFilesView(fileList);
+            setFiles(filesBlob);
+        }
     }
+    const handleRemoveImage = (file: UploadFile) => {
+        console.log(123)
+        const fileIndex =  filesView.findIndex((fileItem) => fileItem.uid === file.uid);
+        const newState = filesView;
+        newState[fileIndex] = {uid:fileIndex.toString(),name: "removed"  };
+        setFilesView(newState);
+    };
     const uploadButton = (
         <button style={{ border: 0, background: 'none' }} type="button">
             <PlusOutlined />

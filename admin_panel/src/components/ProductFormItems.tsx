@@ -218,7 +218,7 @@ export default function ProductFormItems({initialState,setState,handleSubmitForm
                     
                     <div className="md:ml-32 lg:ml-64 2xl:ml-72">
                         <h2 className="mt-3 font-semibold text-sm pb-5">Porudct Images </h2>
-                        <FileUpload images={oldImages} setFiles={handleSetfiles} ></FileUpload>
+                        <FileUpload oldImages={oldImages} setFiles={handleSetfiles} ></FileUpload>
                     </div>
                 </div>
             {children}

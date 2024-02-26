@@ -1,5 +1,5 @@
 "use client"
-import {AllCategories, Product, ProductFormData} from "@/types";
+import {AllCategories, Product, ProductFormData, UpdateFileData} from "@/types";
 import {Dispatch, SetStateAction, useEffect, useReducer, useState} from "react";
 import ProductForm from "@/components/ProductForm";
 import FileUpload from "@/components/ImageUpload";
@@ -26,7 +26,12 @@ export default function GenericProductForm({productId}:{productId?: string}) {
                 .then(data => {
                     if(data){
                         const {title, description, discount, ProductWeight, price, categoryId, typeId, images, CaloryInfo,category, type} = data;
-                        const FormDataState = {title, description, discount, ProductWeight, price, categoryId, typeId, Images: [], oldImages: images, CaloryInfo};
+                        const EmptyFileData: UpdateFileData = {
+                            replace: [],
+                            remove: [],
+                            push: []
+                        }
+                        const FormDataState = {title, description, discount, ProductWeight, price, categoryId, typeId, Images: [], oldImages: images, CaloryInfo, FileData: EmptyFileData}
                         setState(FormDataState);
                         setOldState(FormDataState);
                         setActiveCategory(category.title);
@@ -44,9 +49,9 @@ export default function GenericProductForm({productId}:{productId?: string}) {
     const [categoryData , setCategoryData] = useState<MenuProps['items']>([])
 
     const {width, height} =  useWindowDimensions()
-    const handleSetfiles = (files: File[]) => {
-        setState(prevState => ({...prevState, Images: files}))
-    }
+    const handleSetfiles = (files: File[], FileData?: UpdateFileData) => {
+        setState(prevState => ({...prevState, Images: files, FileData }));
+    };
 
 
     useEffect(()=> {
@@ -87,11 +92,15 @@ export default function GenericProductForm({productId}:{productId?: string}) {
         console.log(state, "STATE")
         if(productId){
             const formData = new FormData();
-            for (let key of Object.keys(state)) {
+            const  { Images,oldImages,...data} = state;
+            Images.forEach((file, index) => {
+                formData.append('files', file, file.name);
+            });
+            for (let key of Object.keys(data)) {
                 if (key in state && oldState) {
                     const typedKey = key as keyof typeof state;
                     if (state[typedKey] !== oldState[typedKey]) {
-                        let PushValue = (typeof state[typedKey] !== "string" || typeof state[typedKey] !==typeof File) ? JSON.stringify(state[typedKey]) : state[typedKey]
+                        let PushValue = (typeof state[typedKey] == "string" || typeof state[typedKey] ==typeof File) ?  state[typedKey] : JSON.stringify(state[typedKey])
                         formData.append(typedKey, PushValue as any);
                     }
                 }
@@ -180,7 +189,7 @@ export default function GenericProductForm({productId}:{productId?: string}) {
                             <TextArea value={description} rows={4} maxLength={100} onChange={e=>{ setState(prevState => ({...prevState,description: e.target.value}))}}/>
                         </Form.Item>
                         <h2 className="mt-3 font-semibold text-sm">Add calories Info </h2>
-                        <Flex vertical={width< 1140? true : false} justify={"space-between"} gap="large">
+                        <Flex vertical={width < 1140} justify={"space-between"} gap="large">
                             <div className="flex flex-col">
                                 <h2 className={`mt-3 font-semibold text-xs  ${ width> 1000 && "text-start"}`}>Proteins </h2>
                                 <Form.Item
@@ -282,7 +291,7 @@ export default function GenericProductForm({productId}:{productId?: string}) {
                     </Space>
                     <div className="md:ml-32 lg:ml-64 2xl:ml-72">
                         <h2 className="mt-3 font-semibold text-sm pb-5">Porudct Images </h2>
-                        <FileUpload images={oldImages} setFiles={handleSetfiles} ></FileUpload>
+                        <FileUpload oldImages={oldImages} setFiles={handleSetfiles} ></FileUpload>
                     </div>
                 </div>
                 <Button type="default" htmlType="submit">{productId ? 'Update' : 'Create'}</Button>

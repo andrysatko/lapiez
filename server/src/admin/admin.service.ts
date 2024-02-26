@@ -52,7 +52,7 @@ export class AdminService {
         const product = await this.prismaService.product.findUnique({where:{id:product_Id}});
         if(!product) throw new HttpException('Product not found', 404);
         const FilesNames = product.images;
-        if(files && files.length > 0){
+        if(files){
             try {
             if(!FileData){
                 throw new BadRequestException('FileData should be provided for uploaded files');
@@ -61,8 +61,9 @@ export class AdminService {
             if(FileData.replace){
                 FileData.replace.map(replaceItem =>{
                     if(replaceItem.index < 0 || replaceItem.index > FilesNames.length) throw new BadRequestException(`Index ${replaceItem.index} out of range`);
-                    const NewFileName = uuid.v4()  + `.${files[replaceItem.index].mimetype.split('/')[1]}`;
-                    fs.writeFileSync(path.join(filePath, NewFileName),  files[replaceItem.index].buffer);
+                    const FILE = files.filter(file => file.originalname === replaceItem.fileName)[0];
+                    const NewFileName = uuid.v4()  + FILE.originalname.split('.').pop()
+                    fs.writeFileSync(path.join(filePath, NewFileName),  FILE.buffer);
                     const unlinkPath = path.join(filePath, FilesNames[replaceItem.index])
                     if(fs.existsSync(unlinkPath)){
                         fs.unlinkSync(unlinkPath)

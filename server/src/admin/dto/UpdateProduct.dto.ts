@@ -37,7 +37,7 @@ class NewImages {
     push?: string[];
     @IsOptional()
     @IsArray()
-    @IsString({each:true})
+    @IsInt({each:true})
     remove?: number[];
 }
 class CalorySubClass {
