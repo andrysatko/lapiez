@@ -4,7 +4,7 @@ import {
     ValidationArguments,
     validateSync,
 } from 'class-validator';
-import {Transform} from "class-transformer";
+import {plainToInstance, Transform} from "class-transformer";
 import { plainToClass } from 'class-transformer';
 
 /**
@@ -28,13 +28,13 @@ export function CustomValidateNested(
                     args.value;
                     if (Array.isArray(value)) {
                         for (let i = 0; i < (<Array<any>>value).length; i++) {
-                            if (validateSync(plainToClass(schema, value[i])).length) {
+                            if (validateSync(plainToInstance(schema, value[i])).length) {
                                 return false;
                             }
                         }
                         return true;
                     } else
-                        return validateSync(plainToClass(schema, value)).length
+                        return validateSync(plainToInstance(schema, value)).length
                             ? false
                             : true;
                 },
@@ -43,7 +43,7 @@ export function CustomValidateNested(
                         for (let i = 0; i < (<Array<any>>args.value).length; i++) {
                             return (
                                 `${args.property}::index${i} -> ` +
-                                validateSync(plainToClass(schema, args.value[i]))
+                                validateSync(plainToInstance(schema, args.value[i]))
                                     .map((e) => e.constraints)
                                     .reduce((acc, next) => acc.concat(Object.values(next)), [])
                             ).toString();
@@ -51,7 +51,7 @@ export function CustomValidateNested(
                     } else
                         return (
                             `${args.property}: ` +
-                            validateSync(plainToClass(schema, args.value))
+                            validateSync(plainToInstance(schema, args.value))
                                 .map((e) => e.constraints)
                                 .reduce((acc, next) => acc.concat(Object.values(next)), [])
                         ).toString();

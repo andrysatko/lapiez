@@ -74,6 +74,7 @@ export class UpdateProductDto implements TImplements {
             throw new BadRequestException('CaloryInfo invalid JSON format: ' + error.message);
         }
     })
+    @IsOptional()
     @CustomValidateNested(CalorySubClass)
     @Type(() => CalorySubClass)
     @ApiProperty()
@@ -108,9 +109,9 @@ export class UpdateProductDto implements TImplements {
     @ApiProperty()
     title?: string;@CustomValidateNested(CalorySubClass)
     @IsOptional()
-    @IsMongoId()
+    @Transform(({value}) => value === 'null' ? null : value,{toClassOnly:true})
     @ApiProperty()
-    typeId?: string;
+    typeId?: string | null;
     @IsOptional()
     @IsMongoId()
     @ApiProperty()
@@ -125,6 +126,7 @@ export class UpdateProductDto implements TImplements {
             throw new BadRequestException('' + error.message);
         }
     })
+    @IsOptional()
     @CustomValidateNested(NewImages)
     @Type(() => NewImages)
     FileData?: NewImages;

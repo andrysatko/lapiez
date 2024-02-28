@@ -39,10 +39,11 @@ model Type {
 
 model Product {
   id            String                 @id @default(auto()) @map("_id") @db.ObjectId
+  available     Boolean                @default(true)
   title         String
   description   String
   discount      Int?
-  oldImages     String[]
+  images        String[]
   CaloryInfo    CaloryInfo
   ProductWeight Float
   price         Float

@@ -15,7 +15,6 @@ export class ProductService {
 
     getAll(){
         const data =this.prisma.product.findMany({include:{type:true,category:true}});
-        console.log(data);
         return data;
     }
     getById(id: string){

@@ -11,6 +11,7 @@ import {id} from "postcss-selector-parser";
 import TextArea from "antd/es/input/TextArea";
 import { useRouter } from 'next/navigation'
 import useWindowDimensions from "@/hook/useWindowDimensions";
+import CategoryDropDown from "@/components/CategoryDropDown";
 
 const EmptyState: ProductFormData = {title: "", description: "", discount: null, ProductWeight: 0, price: 0, categoryId: "", typeId: null, Images: [], CaloryInfo: {Proteins: 0, Carbohydrates: 0, Fats: 0, CalorieContent: 0}}
 
@@ -31,65 +32,24 @@ export default function GenericProductForm({productId}:{productId?: string}) {
                             remove: [],
                             push: []
                         }
-                        const FormDataState = {title, description, discount, ProductWeight, price, categoryId, typeId, Images: [], oldImages: images, CaloryInfo, FileData: EmptyFileData}
+                        const FormDataState = {title, description, discount, ProductWeight, price, categoryId: data.categoryId, typeId: typeId, Images: [], oldImages: images, CaloryInfo, FileData: EmptyFileData}
                         setState(FormDataState);
                         setOldState(FormDataState);
-                        setActiveCategory(category.title);
-                        setActiveType(type?.title ?? null);
                     }
                 })
         }
-    },[])
+    },[productId])
     const [form] = Form.useForm();
     const {title, description, discount, ProductWeight, price, categoryId, typeId, Images, oldImages, CaloryInfo} = state;
 
-    const [ActiveCategory, setActiveCategory] = useState<string>()
-    const [ActiveType, setActiveType] = useState<string| null>()
-    const [ActiveImageCategory , setActiveImageCategory] = useState<string | null>()
-    const [categoryData , setCategoryData] = useState<MenuProps['items']>([])
+
 
     const {width, height} =  useWindowDimensions()
     const handleSetfiles = (files: File[], FileData?: UpdateFileData) => {
         setState(prevState => ({...prevState, Images: files, FileData }));
     };
 
-
-    useEffect(()=> {
-        const setActiveicon = (icon: string) => {
-            const url = host+ "/static/categories/"+ icon
-            setActiveImageCategory(url);
-        }
-        const Items: MenuProps['items'] = []
-        fetch(host + Endpoints.CategoriesAndTypes).then(response => response.json()).then((data: AllCategories) => {
-            data.forEach((item, index) => {
-                Items.push({
-                    key: String(index + 1),
-                    label: <button className="w-full flex flex-row" onClick={e => {
-                        setState(prevState => ({...prevState, categoryId: item.id, typeId: null}));
-                        setActiveicon(item.icon);
-                        setActiveCategory(item.title);
-                        setActiveType(null);
-                    }}>
-                        <img src={host + "/static/categories/" + item.icon} width={40} height={40}/>
-                        {item.title}</button>,
-                    type: 'sub menu',
-                    children: item.types.map(type => ({
-                        key: type.id,
-                        label: <button onClick={e => {
-                            setState(prevState => ({...prevState, categoryId: item.id, typeId: type.id}));
-                            setActiveicon(item.icon);
-                            setActiveCategory(item.title);
-                            setActiveType(type.title);
-                        }}> {type.title} </button>,
-                    }))
-                } as any)
-            })
-            setCategoryData(Items)
-        }).then(data => data)
-    }, [])
-
     const handleSubmitForm = async ()=>{
-        console.log(state, "STATE")
         if(productId){
             const formData = new FormData();
             const  { Images,oldImages,...data} = state;
@@ -109,7 +69,6 @@ export default function GenericProductForm({productId}:{productId?: string}) {
                 method: 'PUT',
                 body: formData
             })
-
         }
         else {
             const formData = new FormData();
@@ -141,6 +100,9 @@ export default function GenericProductForm({productId}:{productId?: string}) {
     form.setFieldsValue({"discount": discount})
     form.setFieldsValue({"weight": ProductWeight})
 
+    const OnItemClickCallback = (categoryId: string, typeId: string  | null) => {
+        setState(prevState => ({...prevState, categoryId, typeId}))
+    }
     return (
         <>
             <Form form={form} onFinish={handleSubmitForm}>
@@ -153,14 +115,7 @@ export default function GenericProductForm({productId}:{productId?: string}) {
                         },
                     ]}
                 >
-                    <Dropdown menu={ {items: categoryData}} trigger={['click']}>
-                        <Button>
-                            <Space>
-                                Category:({ActiveCategory}) <pre/>Type:({ActiveType})
-                                <DownOutlined />
-                            </Space>
-                        </Button>
-                    </Dropdown>
+                    <CategoryDropDown onItemClickCallback={OnItemClickCallback} defaultValues={{categoryId:categoryId,typeId:typeId}}></CategoryDropDown>
                 </Form.Item>
                 <div className="flex flex-col md:flex-row lg:flex-row 2xl:flex-row">
                     <Space direction="vertical">

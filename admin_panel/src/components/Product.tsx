@@ -8,9 +8,11 @@ import EditIcon from "../../public/edit.svg";
 import Link from "next/link";
 
 export default function Porudct ({ ...product}: Product ){
-    const {id, title, description , discount , images, ProductWeight ,price , categoryId , typeId, CaloryInfo ,category, type} = product;
+    const {id, title, description , discount , images, ProductWeight ,price , categoryId , typeId, CaloryInfo ,category, type,available} = product;
     return (
+
         <List.Item style={{marginTop: 20, borderBottom: "1px solid #fcb103"}}>
+            <h2 className={`text-lg ${available ? 'text-green-500': 'text-red-500' }`}>{available ? "In stock": "Not available"}</h2>
             <h1 className="mt-2 font-bold text-5xl">{title}</h1>
             {images.length > 0 && <div className="mt-3"><Image.PreviewGroup
             preview={{

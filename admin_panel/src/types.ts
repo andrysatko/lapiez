@@ -1,5 +1,6 @@
 type Product = {
     id: string
+    available: boolean
     title: string
     description: string
     discount: number | null

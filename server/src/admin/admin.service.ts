@@ -52,7 +52,14 @@ export class AdminService {
         const product = await this.prismaService.product.findUnique({where:{id:product_Id}});
         if(!product) throw new HttpException('Product not found', 404);
         const FilesNames = product.images;
-        if(files){
+        if(body.categoryId){
+            const isCategory = await this.prismaService.category.findUnique({where:{id:body.categoryId},include:{types:true}});
+            if(!isCategory) throw new BadRequestException('Category not found');
+            if(body.typeId){
+                if(!isCategory.types.map(type => type.id).includes(body.typeId)) throw new BadRequestException('Type not found in category');
+            }
+        }
+        if(files.length > 0){
             try {
             if(!FileData){
                 throw new BadRequestException('FileData should be provided for uploaded files');
