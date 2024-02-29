@@ -6,4 +6,5 @@ export const Endpoints = {
     ProductById : "/product/ProductById/",
     CreateProduct : "/admin/create-product",
     UpdateProduct : "/admin/update-product",
+    DeleteProduct : "/admin/delete-product",
 }

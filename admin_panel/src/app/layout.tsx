@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AntdRegistry } from '@ant-design/nextjs-registry';
-import {ConfigProvider, Layout} from "antd";
+import {Avatar, Button, ConfigProvider, Layout} from "antd";
 import ProductIcon from "../../public/products-svgrepo-com.svg";
 import UsersIcon from "../../public/users-svgrepo-com.svg";
 import DeliveryIcon from "../../public/fast-food-truck-truck-svgrepo-com.svg";
@@ -15,6 +15,7 @@ import {Comfortaa} from "@next/font/google";
 import {Header, Footer, Content} from "antd/es/layout/layout";
 import {MenuItemType} from "antd/es/menu/hooks/useItems";
 import Link from "next/link";
+import {UserOutlined} from "@ant-design/icons";
 const confortaa = Comfortaa({
   subsets: ["latin","cyrillic","cyrillic-ext"],
 });
@@ -75,7 +76,13 @@ export default function RootLayout({
         <Layout>
         <DashboardSlider items={items}/>
           <Layout>
-            <Header style={{ padding: 0, background: "red", height:  90,zIndex: 998}} className="sticky top-0" />
+            {/*<Header style={{ padding: 0, background: "red", height:  90,zIndex: 998}} className="sticky top-0" />*/}
+            <Header style={{ padding: 27, background: "red", height:  90,zIndex: 998, backgroundColor: "white"}} className="sticky top-0 flex justify-end">
+              <div className="flex flex-row items-center mr-10">
+                <h3>Welcome, admin!</h3>
+                <Avatar size={32} icon={<UserOutlined />} />
+              </div>
+            </Header>
             <Content style={{ margin: '24px 16px 0', zIndex: 950 }}>
               <div
                   style={{

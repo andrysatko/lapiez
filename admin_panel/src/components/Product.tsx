@@ -7,7 +7,40 @@ import WeightIcon from "../../public/weight.svg";
 import EditIcon from "../../public/edit.svg";
 import Link from "next/link";
 
-export default function Porudct ({ ...product}: Product ){
+export default function Porudct ({ deleteProduct,...product}: Product & {deleteProduct: (id: string) => void}){
+    const [open, setOpen] = useState(false);
+    const [confirmLoading, setConfirmLoading] = useState(false);
+    const [modalText, setModalText] = useState('This product will be temporary deleted');
+    const handleCancel = () => {
+        setOpen(false);
+    };
+    const showModal = () => {
+        setOpen(true);
+    };
+    const handleOk = () => {
+        setModalText('Deleting product ...');
+        setConfirmLoading(true);
+        const response = fetch(host + Endpoints.DeleteProduct + `/${product.id}`, {method: "DELETE"})
+            .then(
+                response=> {
+                    if(response.ok){
+                        setModalText('Product deleted successfully');
+                        setConfirmLoading(false);
+                        setTimeout(() => {
+                            setOpen(false);
+                            setConfirmLoading(false);
+                            deleteProduct(product.id);
+                        }, 3000);
+                    }else {
+                        setModalText('Failed to delete product');
+                        setTimeout(() => {
+                            setOpen(false);
+                            setConfirmLoading(false);
+                        }, 3000);
+                    }
+                }
+            )
+    };
     const {id, title, description , discount , images, ProductWeight ,price , categoryId , typeId, CaloryInfo ,category, type,available} = product;
     return (
 
@@ -15,13 +48,9 @@ export default function Porudct ({ ...product}: Product ){
             <h2 className={`text-lg ${available ? 'text-green-500': 'text-red-500' }`}>{available ? "In stock": "Not available"}</h2>
             <h1 className="mt-2 font-bold text-5xl">{title}</h1>
             {images.length > 0 && <div className="mt-3"><Image.PreviewGroup
-            preview={{
-                onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
-            }}
         >
             {images.map((image,index ) => {
                 const url  = host + staticDir+"/products/" +   image;
-                console.log(url)
                 return (<Image key={index} src={url} alt={title} width={250} height={250}/>)
             }  )}
         </Image.PreviewGroup>
@@ -63,10 +92,20 @@ export default function Porudct ({ ...product}: Product ){
                 type="primary"
                 danger
                 style={{ fontWeight: "bold"}}
+                onClick={showModal}
             >
                 Delete product
             </Button>
             </Flex>
+            <Modal
+                title={(<h2 className="text-md text-red-600">Warning</h2>)}
+                open={open}
+                onOk={handleOk}
+                confirmLoading={confirmLoading}
+                onCancel={handleCancel}
+            >
+                <p>{modalText}</p>
+            </Modal>
         </List.Item>
     )}
 

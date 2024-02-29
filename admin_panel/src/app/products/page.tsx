@@ -1,5 +1,5 @@
 'use client'
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {usePathname, useSearchParams} from 'next/navigation'
 import {useRouter} from "next/navigation";
 import {Product} from "@/types";
@@ -43,44 +43,20 @@ const Page = () => {
 
         }
     }
+    const HandleDeleteProduct = (ProductId: string )=>{
+        setData(data?.filter((item) => item.id !== ProductId))
+    }
 
-
-    // const [DisabledCheckBoxes, setDisabledCheckBoxes] = useState<{available:boolean , notAvailable:boolean, discount:boolean}>({available:false, notAvailable:false, discount:false})
-    // const onChangeAvailable: CheckboxProps['onChange'] = (e) => {
-    //     e.target.checked
-    //         ? (() => {
-    //             setFilteredData(FilterData?.filter((item) => item.available));
-    //             setDisabledCheckBoxes({...DisabledCheckBoxes, notAvailable:true});
-    //         })()
-    //         :
-    //         (() => {
-    //             setFilteredData(data);
-    //             setDisabledCheckBoxes({...DisabledCheckBoxes, notAvailable:false});
-    //         })();
-    // };
-    //
-    // const onChangeNotAvailable: CheckboxProps['onChange'] = (e) => {
-    //     e.target.checked
-    //         ? (() => {
-    //             setFilteredData(data?.filter((item) => !item.available));
-    //             setDisabledCheckBoxes({...DisabledCheckBoxes, available:true});
-    //         })()
-    //         :
-    //         (() => {
-    //             setFilteredData(data);
-    //             setDisabledCheckBoxes({...DisabledCheckBoxes, available:false});
-    //         })();
-    // }
-    // const onChangeDiscount: CheckboxProps['onChange'] = (e) => {
-    //     e.target.checked ? setFilteredData(FilterData?.filter((item) => item.discount)) : setFilteredData(FilterData);
-    // }
     const [FilterData , setFilteredData] = useState<Product[]>()
+    useEffect(() => {
+        data && setFilteredData(data)
+    }, [data]);
     const [SelectedFilters , setSelectedFilters] =
-        useState<{Available: boolean, NotAvailable: boolean, Discount: boolean, Category:{categoryId:string,typeId: string | null} | false }>({Available:false, NotAvailable:false, Discount:false, Category: false})
+        useState<{Available: boolean, NotAvailable: boolean, Discount: boolean, Category:{categoryId:string,typeId: string | null} | undefined, SearchName: string | undefined }>({Available:false, NotAvailable:false, Discount:false, Category: undefined, SearchName: undefined})
 
     useEffect(() => {
         if(SelectedFilters){
-            const {Available, NotAvailable, Discount, Category} = SelectedFilters;
+            const {Available, NotAvailable, Discount, Category, SearchName} = SelectedFilters;
             let FilteredData = data;
             if(Available){
                 FilteredData = FilteredData?.filter((item) => item.available);
@@ -96,6 +72,11 @@ const Page = () => {
                 if(Category.typeId){
                     FilteredData = FilteredData?.filter((item=> item.typeId === Category.typeId));
                 }
+            }
+            if(SearchName){
+                FilteredData = FilteredData?.filter(({ title }) =>
+                    title.toLowerCase().includes(SearchName.toLowerCase())
+                )
             }
             setFilteredData(FilteredData);
         }
@@ -135,7 +116,7 @@ const Page = () => {
                     <div>Not available <span style={{color:"black"}}>({data.filter((item) => !item.available).length})</span></div>
                 </div>
                 <div className="flex flex-row gap-1 w-80 mr-10">
-                    <Input placeholder="Search products by name"/>
+                    <Input onChange={e=> setSelectedFilters({...SelectedFilters, SearchName: e.target.value})} placeholder="Search products by name"/>
                     <Button type="default">search</Button>
                 </div>
             </div>
@@ -159,7 +140,7 @@ const Page = () => {
                 }}
                 dataSource={FilterData}
                 split={true}
-                renderItem={(item) => <Porudct {...item}/>}
+                renderItem={(item) => <Porudct {...item} deleteProduct={HandleDeleteProduct}/>}
             >
             </List>
         </div>
