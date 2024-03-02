@@ -34,7 +34,7 @@ type Product = {
 }
 type CategorySTypes = {types: {id: string, title: string, createdAt: Date, updatedAt: Date, categoryId: string}[]  ,id: string, title: string, icon: string, createdAt: Date, updatedAt: Date}
 type AllCategories = CategorySTypes[]
-type ProductFormData = Pick<Product, "title" | "description" | "discount" | "ProductWeight" | "price" | "categoryId" | "typeId"| "CaloryInfo"> & {Images: File[]} & {oldImages? : string[]} & {FileData?: UpdateFileData}
+type ProductFormData = Pick<Product, "title" | "description" | "discount" | "ProductWeight" | "price" | "categoryId" | "typeId"| "CaloryInfo" | "available"> & {Images: File[]} & {oldImages? : string[]} & {FileData?: UpdateFileData}
 
 type UpdateFileData = {
     replace?: {

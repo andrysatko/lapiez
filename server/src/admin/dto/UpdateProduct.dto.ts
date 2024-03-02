@@ -1,7 +1,7 @@
 import {Prisma} from '@prisma/client';
 import {
     ArrayNotEmpty,
-    IsArray, IsDefined, IsInt, IsJSON,
+    IsArray, IsBoolean, IsDefined, IsInt, IsJSON,
     IsMongoId, IsNotEmptyObject,
     IsNumber, IsObject,
     IsOptional, IsString,
@@ -117,7 +117,6 @@ export class UpdateProductDto implements TImplements {
     @ApiProperty()
     categoryId?: string;
 
-
     @IsOptional()
     @Transform(({value})=>{
         try {
@@ -130,6 +129,11 @@ export class UpdateProductDto implements TImplements {
     @CustomValidateNested(NewImages)
     @Type(() => NewImages)
     FileData?: NewImages;
+    @IsOptional()
+    @Transform(({value}) => JSON.parse(value),{toClassOnly:true})
+    @IsBoolean()
+    available: boolean;
+
 }
 
 
@@ -142,5 +146,6 @@ export const  SchemaSwaggerUpdateProductDto :  Record<keyof UpdateProductDto, Sc
     discount: {type:'float', nullable:true},
     price: {type:'float', nullable:true},
     title: {type:'string', nullable:true},
-    typeId: {type:'string', nullable:true}
+    typeId: {type:'string', nullable:true},
+    available: {type:'boolean', nullable:true}
 }

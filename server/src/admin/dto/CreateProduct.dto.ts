@@ -1,7 +1,7 @@
 import {Prisma} from '@prisma/client';
 import {
     ArrayNotEmpty,
-    IsArray, IsDefined, IsInt, IsJSON,
+    IsArray, IsBoolean, IsDefined, IsInt, IsJSON,
     IsMongoId, IsNotEmptyObject,
     IsNumber, IsObject,
     IsOptional, IsString,
@@ -81,6 +81,10 @@ export class CreateProductDto implements Prisma.ProductUncheckedCreateInput {
     @IsMongoId()
     @ApiProperty()
     categoryId: string;
+    @IsOptional()
+    @Transform(({value}) => JSON.parse(value),{toClassOnly:true})
+    @IsBoolean()
+    available: boolean;
 }
 
 export const  SchemaSwaggerCreateProductDto :  Record<keyof CreateProductDto, SchemaObject | ReferenceObject> = {
@@ -91,5 +95,6 @@ export const  SchemaSwaggerCreateProductDto :  Record<keyof CreateProductDto, Sc
     discount: {type:'float'},
     price: {type:'float'},
     title: {type:'string'},
-    typeId: {type:'string'}
+    typeId: {type:'string'},
+    available: {type:'boolean', nullable:true}
 }

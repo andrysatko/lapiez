@@ -44,40 +44,35 @@ const FileUpload= ({oldImages, setFiles}: {oldImages?: Product["images"] , setFi
         setPreviewTitle(file.name || file.url!.substring(file.url!.lastIndexOf('/') + 1));
     };
 
-    const handleChange: UploadProps['onChange'] = ({ fileList }) => {
+    useEffect(() => {
+        console.log(filesView, "FILES VIEW")
         const filesBlob: File[] = [];
         if(oldImages && oldImages.length>0){
             const fileData: UpdateFileData = {};
-            for(let index = 0 ; index <  fileList.length ; index++){
-                if(fileList[index].originFileObj){
-                    filesBlob.push(fileList[index].originFileObj as File);
-                    if(oldImages[index] &&  oldImages[index] !== fileList[index].name){
-                     fileData.replace = fileData.replace ? [...fileData.replace, {fileName:fileList[index].name, index}] : [{fileName: fileList[index].name, index}];
+            for(let index = 0 ; index <  filesView.length ; index++){
+                if(filesView[index]?.originFileObj){
+                    filesBlob.push(filesView[index].originFileObj as File);
+                    if(oldImages[index] &&  oldImages[index] !== filesView[index].name){
+                        fileData.replace = fileData.replace ? [...fileData.replace, {fileName:filesView[index].name, index}] : [{fileName: filesView[index].name, index}];
                     }
                     if(!oldImages[index]){
-                        fileData.push = fileData.push ? [...fileData.push, fileList[index].name] : [fileList[index].name];
+                        fileData.push = fileData.push ? [...fileData.push, filesView[index].name] : [filesView[index].name];
                     }
                 }
+                if(filesView[index]=== undefined && oldImages[index]!== undefined){
+                    fileData.remove = fileData.remove ? [...fileData.remove, index] : [index];
+                }
             }
-            if(fileList.length < oldImages.length){
-                oldImages.map((image, index)=>{
-                if(!fileList[index]){
-                        fileData.remove = fileData.remove ? [...fileData.remove, index] : [index];
-                    }
-                })
-            }
-            setFilesView(fileList);
             setFiles(filesBlob, fileData);
         }else{
-            fileList.filter(FILES => FILES.originFileObj).map(fileListItem =>{
+            filesView.filter(FILES => FILES.originFileObj).map(fileListItem =>{
                 filesBlob.push(fileListItem.originFileObj as File);
             })
-            setFilesView(fileList);
             setFiles(filesBlob);
         }
-    }
+    }, [filesView]);
+
     const handleRemoveImage = (file: UploadFile) => {
-        console.log(123)
         const fileIndex =  filesView.findIndex((fileItem) => fileItem.uid === file.uid);
         const newState = filesView;
         newState[fileIndex] = {uid:fileIndex.toString(),name: "removed"  };
@@ -96,18 +91,27 @@ const FileUpload= ({oldImages, setFiles}: {oldImages?: Product["images"] , setFi
         }
         return e?.fileList;
     };
+    const handleChangeOne = (index:number):UploadProps['onChange']=> {
+        return ({ fileList }) => {
+            const prevState = [...filesView];
+            prevState[index] = fileList[0];
+            setFilesView(prevState);
+        };
+    }
     return (
         <>
             <Form.Item valuePropName="fileList" getValueFromEvent={normFile} required={false}>
-            <Upload
-                beforeUpload={() => false}
-                listType="picture-card"
-                fileList={filesView}
-                onPreview={handlePreview}
-                onChange={handleChange}
-            >
-                {filesView.length >= 3 ? null : uploadButton}
-            </Upload>
+                {Array.from({length: 3},(_,i)=> i).map(index=>
+                    <Upload
+                        beforeUpload={() => false}
+                        listType="picture-card"
+                        fileList={filesView[index] ? [filesView[index]] : []}
+                        onPreview={handlePreview}
+                        onChange={handleChangeOne(index)}
+                    >
+                        {filesView[index] ? null : uploadButton}
+                    </Upload>
+                )}
             <Modal open={previewOpen} title={previewTitle} footer={null} onCancel={handleCancel}>
                 <img alt="example" style={{ width: '100%' }} src={previewImage} />
             </Modal>

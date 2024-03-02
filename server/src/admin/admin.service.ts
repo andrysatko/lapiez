@@ -48,23 +48,24 @@ export class AdminService {
     }
     async UpdateProduct(product_Id: string,body: UpdateProductDto,files?: Express.Multer.File[] | undefined){
         const MaxAvailableFiles = 3;
+        const filePath = path.join(process.cwd(),'static','products')
         const {CaloryInfo , FileData, ...rest} = body;
         const product = await this.prismaService.product.findUnique({where:{id:product_Id}});
         if(!product) throw new HttpException('Product not found', 404);
         const FilesNames = product.images;
         if(body.categoryId){
-            const isCategory = await this.prismaService.category.findUnique({where:{id:body.categoryId},include:{types:true}});
+            const isCategory = await this.prismaService.category.findUnique({where:{id:body.categoryId}});
             if(!isCategory) throw new BadRequestException('Category not found');
-            if(body.typeId){
-                if(!isCategory.types.map(type => type.id).includes(body.typeId)) throw new BadRequestException('Type not found in category');
-            }
+        }
+        if(body.typeId){
+            const isType = await this.prismaService.category.findUnique({where:{id:body.typeId}});
+            if(!isType) throw new BadRequestException('Type not found');
         }
         if(files.length > 0){
             try {
             if(!FileData){
                 throw new BadRequestException('FileData should be provided for uploaded files');
             }
-            const filePath = path.join(process.cwd(),'static','products')
             if(FileData.replace){
                 FileData.replace.map(replaceItem =>{
                     if(replaceItem.index < 0 || replaceItem.index > FilesNames.length) throw new BadRequestException(`Index ${replaceItem.index} out of range`);
@@ -78,16 +79,6 @@ export class AdminService {
                     FilesNames[replaceItem.index] = NewFileName;
                 })
             }
-            if(FileData.remove){
-                FileData.remove.map(index => {
-                    if(index < 0 || index > FilesNames.length) throw new BadRequestException(`Index ${index} out of range`);
-                    const unlinkPath = path.join(filePath, FilesNames[index])
-                    if(fs.existsSync(unlinkPath)){
-                        fs.unlinkSync(unlinkPath)
-                    }
-                    FilesNames.splice(index,1);
-                })
-            }
             if(FileData.push){
                 if(FilesNames.length + FileData.push.length > MaxAvailableFiles) throw new BadRequestException(`Max available files is ${MaxAvailableFiles}`);
                 FileData.push.map((file,index) =>{
@@ -96,17 +87,24 @@ export class AdminService {
                     FilesNames.push(NewFileName);
                 })
             }
-                const updatedProduct =await this.prismaService.product.update({where:{id:product_Id},data:{CaloryInfo:{...product.CaloryInfo, ...CaloryInfo},
-                        ...rest,
-                        images:FilesNames
-                    }})
             }catch (e) {
-                throw new HttpException('Problem while saving product in database', 500);
+                throw new HttpException('Problem while saving file', 500);
             }
         }
-        return this.prismaService.product.update({where:{id:product_Id},data:{CaloryInfo:{...product.CaloryInfo, ...CaloryInfo},
+        if(FileData.remove){
+            FileData.remove.map(index => {
+                if(index < 0 || index > FilesNames.length) throw new BadRequestException(`Index ${index} out of range`);
+                const unlinkPath = path.join(filePath, FilesNames[index])
+                if(fs.existsSync(unlinkPath)){
+                    fs.unlinkSync(unlinkPath)
+                }
+            })
+            FilesNames.filter((_, i) => !FileData.remove.includes(i));
+        }
+        return  this.prismaService.product.update({where:{id:product_Id},data:{CaloryInfo:{...product.CaloryInfo, ...CaloryInfo},
                 ...rest,
-            }});
+                images:FilesNames
+            }})
     }
     async DeleteProduct(productId: string){
         const product = await this.prismaService.product.findUnique({where:{id:productId}});

@@ -4,7 +4,7 @@ import {Dispatch, SetStateAction, useEffect, useReducer, useState} from "react";
 import ProductForm from "@/components/ProductForm";
 import FileUpload from "@/components/ImageUpload";
 import ConfigAnt from "@/app/Config";
-import {Form, Input, Button, Select, Space, Dropdown, MenuProps, Flex, InputNumber} from 'antd';
+import {Form, Input, Button, Select, Space, Dropdown, MenuProps, Flex, InputNumber, Checkbox} from 'antd';
 import {host, Endpoints} from "@/constants";
 import {DownOutlined} from "@ant-design/icons";
 import {id} from "postcss-selector-parser";
@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation'
 import useWindowDimensions from "@/hook/useWindowDimensions";
 import CategoryDropDown from "@/components/CategoryDropDown";
 
-const EmptyState: ProductFormData = {title: "", description: "", discount: null, ProductWeight: 0, price: 0, categoryId: "", typeId: null, Images: [], CaloryInfo: {Proteins: 0, Carbohydrates: 0, Fats: 0, CalorieContent: 0}}
+const EmptyState: ProductFormData = {title: "", description: "", discount: null, ProductWeight: 0, price: 0, categoryId: "", typeId: null, Images: [], CaloryInfo: {Proteins: 0, Carbohydrates: 0, Fats: 0, CalorieContent: 0}, available: true}
 
 export default function GenericProductForm({productId}:{productId?: string}) {
     const [oldState, setOldState] = useState<ProductFormData| undefined>()
@@ -26,13 +26,13 @@ export default function GenericProductForm({productId}:{productId?: string}) {
                 .then<Product>(response => response.json())
                 .then(data => {
                     if(data){
-                        const {title, description, discount, ProductWeight, price, categoryId, typeId, images, CaloryInfo,category, type} = data;
+                        const {title, description, discount, ProductWeight, price, categoryId, typeId, images, CaloryInfo,category, type,available} = data;
                         const EmptyFileData: UpdateFileData = {
                             replace: [],
                             remove: [],
                             push: []
                         }
-                        const FormDataState = {title, description, discount, ProductWeight, price, categoryId: data.categoryId, typeId: typeId, Images: [], oldImages: images, CaloryInfo, FileData: EmptyFileData}
+                        const FormDataState = {title, description, discount, ProductWeight, price, categoryId: data.categoryId, typeId: typeId, Images: [], oldImages: images, CaloryInfo, FileData: EmptyFileData, available}
                         setState(FormDataState);
                         setOldState(FormDataState);
                     }
@@ -106,6 +106,13 @@ export default function GenericProductForm({productId}:{productId?: string}) {
     return (
         <>
             <Form form={form} onFinish={handleSubmitForm}>
+                <Form.Item
+                    name="dropdown"
+                >
+                    <Checkbox checked={state.available} onChange={e=>setState({...state,  available:e.target.checked })}>
+                        <h2 className={`text-lg ${state.available ? 'text-green-500': 'text-red-500' }`}>{state.available ? "In stock": "Not available"}</h2>
+                    </Checkbox>
+                </Form.Item>
                 <Form.Item
                     name="dropdown"
                     rules={[
