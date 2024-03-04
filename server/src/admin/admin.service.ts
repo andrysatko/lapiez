@@ -95,13 +95,17 @@ export class AdminService {
             FileData.remove.map(index => {
                 if(index < 0 || index > FilesNames.length) throw new BadRequestException(`Index ${index} out of range`);
                 const unlinkPath = path.join(filePath, FilesNames[index])
-                if(fs.existsSync(unlinkPath)){
+                if(FilesNames[index]!== '' &&  fs.existsSync(unlinkPath)){
                     fs.unlinkSync(unlinkPath)
                 }
             })
-            FilesNames.filter((_, i) => !FileData.remove.includes(i));
+            for(let index of FileData.remove){
+                if(index >= 0 && index < FilesNames.length){
+                    FilesNames[index] ='';
+                }
+            }
         }
-        return  this.prismaService.product.update({where:{id:product_Id},data:{CaloryInfo:{...product.CaloryInfo, ...CaloryInfo},
+        return  this.prismaService.product.update({where:{id:product_Id},data:{ CaloryInfo: CaloryInfo ? {...product.CaloryInfo, ...CaloryInfo} : undefined,
                 ...rest,
                 images:FilesNames
             }})

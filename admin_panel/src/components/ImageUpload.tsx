@@ -22,7 +22,7 @@ const FileUpload= ({oldImages, setFiles}: {oldImages?: Product["images"] , setFi
     useEffect(()=>{
         if (oldImages && oldImages.length > 0){
             const OldFiles = oldImages.map((image, index)=>{
-                return {
+                return image===''? undefined :  {
                     uid: String(index),
                     name: image,
                     status: 'loading',

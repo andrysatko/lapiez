@@ -104,7 +104,7 @@ export default function GenericProductForm({productId}:{productId?: string}) {
         setState(prevState => ({...prevState, categoryId, typeId}))
     }
     return (
-        <>
+        <div className="h-auto">
             <Form form={form} onFinish={handleSubmitForm}>
                 <Form.Item
                     name="dropdown"
@@ -259,6 +259,6 @@ export default function GenericProductForm({productId}:{productId?: string}) {
                 <Button type="default" htmlType="submit">{productId ? 'Update' : 'Create'}</Button>
             </Form>
             <Button danger className="mt-10" type="primary" onClick={()=>router.back()}>Cancel</Button>
-        </>
+        </div>
     )
 }

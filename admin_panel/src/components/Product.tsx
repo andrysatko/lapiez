@@ -1,11 +1,12 @@
 import {Button, Divider, Flex, Image, List, Modal} from 'antd';
-import {useState, useEffect} from "react";
+import React, {useState, useEffect} from "react";
 import {Product} from "@/types";
 import {host, Endpoints, staticDir} from "@/constants"
 import NImage from "next/image";
 import WeightIcon from "../../public/weight.svg";
 import EditIcon from "../../public/edit.svg";
 import Link from "next/link";
+import {PlusOutlined} from "@ant-design/icons";
 
 export default function Porudct ({ deleteProduct,...product}: Product & {deleteProduct: (id: string) => void}){
     const [open, setOpen] = useState(false);
@@ -49,10 +50,14 @@ export default function Porudct ({ deleteProduct,...product}: Product & {deleteP
             <h1 className="mt-2 font-bold text-5xl">{title}</h1>
             {images.length > 0 && <div className="mt-3"><Image.PreviewGroup
         >
+                <div style={{display: "flex", flexWrap: "wrap" }}>
             {images.map((image,index ) => {
-                const url  = host + staticDir+"/products/" +   image;
-                return (<Image key={index} src={url} alt={title} width={250} height={250}/>)
+                return image ? <Image key={index} src={host + staticDir+"/products/" + image} alt={title} width={250} height={250}/> :
+                    <div style={{width:250, height:250, border: "1px dashed #d9d9d9", borderRadius: 8,background:"rgba(0, 0, 0, 0.02)"}} type="button" className="flex flex-col justify-center items-center">
+                        <div>No Data</div>
+                    </div>
             }  )}
+                </div>
         </Image.PreviewGroup>
             </div>}
             <h2 className="font-medium text-2xl">{description}</h2>

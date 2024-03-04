@@ -14,14 +14,24 @@ const Page = () => {
     const pathname = usePathname()
     const searchParams = useSearchParams()
 
-    const handleChangePage = useCallback((page:number)=>{
-        const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams.toString());
+
+    const handleChangePage = (page:number)=>{
         params.set("page", page.toString())
-        router.push(pathname + '?' + params.toString())
-    }, [searchParams])
-    const ActivePage = searchParams.has("page") ?  Number(searchParams.get('page')) : 1
-
-
+        router.push(pathname + '?' + params.toString())}
+    const handleChangeDiscount = (discount: boolean)=>{
+        discount ? params.set("discount", discount.toString()) : params.delete("discount")
+        router.push(pathname + '?' + params.toString())}
+    const handleChangeAvailable = (available: boolean)=>{
+        available ? params.set("available", available.toString()): params.delete("available")
+        router.push(pathname + '?' + params.toString())}
+    const handleChangeNotAvailable = (notAvailable: boolean)=>{
+        notAvailable ?  params.set("notAvailable", notAvailable.toString()): params.delete("notAvailable")
+        router.push(pathname + '?' + params.toString())}
+    const QueryActivePage = searchParams.has("page") ?  Number(searchParams.get('page')) : 1
+    const QueryDiscount = searchParams.get('discount') === 'true'
+    const QueryAvailable  = searchParams.get('available')  === 'true'
+    const QueryNotAvailable = searchParams.get('notAvailable') === 'true'
     const [data, setData] = useState<Product[]>();
     const [isLoading, setLoading] = useState(true);
 
@@ -52,25 +62,26 @@ const Page = () => {
         data && setFilteredData(data)
     }, [data]);
     const [SelectedFilters , setSelectedFilters] =
-        useState<{Available: boolean, NotAvailable: boolean, Discount: boolean, Category:{categoryId:string,typeId: string | null} | undefined, SearchName: string | undefined }>({Available:false, NotAvailable:false, Discount:false, Category: undefined, SearchName: undefined})
+        useState<{Available: boolean, NotAvailable: boolean, Discount: boolean, Category:{categoryId:string,typeId: string | null} | undefined, SearchName: string | undefined }>({Available:QueryAvailable , NotAvailable: QueryNotAvailable, Discount:QueryDiscount, Category: undefined, SearchName: undefined})
 
     useEffect(() => {
-        if(SelectedFilters){
+        if(SelectedFilters && data){
             const {Available, NotAvailable, Discount, Category, SearchName} = SelectedFilters;
             let FilteredData = data;
             if(Available){
-                FilteredData = FilteredData?.filter((item) => item.available);
+                FilteredData = FilteredData.filter((item) => item.available);
             }
             if(NotAvailable){
-                FilteredData = FilteredData?.filter((item) => !item.available);
+                FilteredData = FilteredData.filter((item) => !item.available);
             }
             if(Discount){
-                FilteredData = FilteredData?.filter((item) => item.discount);
+                console.log("DISCOUNT", Discount)
+                FilteredData = FilteredData.filter((item) => item.discount);
             }
             if(Category){
-                FilteredData = FilteredData?.filter((item) => item.categoryId === Category.categoryId);
+                FilteredData = FilteredData.filter((item) => item.categoryId === Category.categoryId);
                 if(Category.typeId){
-                    FilteredData = FilteredData?.filter((item=> item.typeId === Category.typeId));
+                    FilteredData = FilteredData.filter((item=> item.typeId === Category.typeId));
                 }
             }
             if(SearchName){
@@ -80,16 +91,33 @@ const Page = () => {
             }
             setFilteredData(FilteredData);
         }
-    }, [SelectedFilters]);
+    }, [SelectedFilters,data]);
 
     const onChangeNotAvailable: CheckboxProps['onChange'] = (e) => {
-        e.target.checked ? setSelectedFilters({...SelectedFilters , NotAvailable: true, Available: false}) : setSelectedFilters({...SelectedFilters , NotAvailable: false});
+        if(e.target.checked){
+            handleChangeNotAvailable(true)
+            handleChangeAvailable(false)
+            setSelectedFilters({...SelectedFilters , NotAvailable: true, Available: false});
+        }
+        else{
+            handleChangeNotAvailable(false)
+            setSelectedFilters({...SelectedFilters , NotAvailable: false});
+        }
     }
     const onChangeAvailable: CheckboxProps['onChange'] =(e)=> {
-        e.target.checked ? setSelectedFilters({...SelectedFilters, Available: true, NotAvailable: false}) : setSelectedFilters({...SelectedFilters, Available: false});
+        if(e.target.checked){
+            handleChangeAvailable(true)
+            handleChangeNotAvailable(false)
+            setSelectedFilters({...SelectedFilters, Available: true, NotAvailable: false});
+        }
+        else {
+            handleChangeAvailable(false)
+            setSelectedFilters({...SelectedFilters, Available: false})
+        }
     }
 
     const onChangeDiscount: CheckboxProps['onChange'] =(e)=> {
+        handleChangeDiscount(e.target.checked)
         e.target.checked ? setSelectedFilters({...SelectedFilters, Discount: true}) : setSelectedFilters({...SelectedFilters, Discount: false});
     }
     const ChangeCategoryWithType = (categoryId: string, typeId: string | null)=>{
@@ -123,7 +151,7 @@ const Page = () => {
             <div className="flex flex-row gap-3 mt-5">
                 <Checkbox checked={SelectedFilters.Available} onChange={onChangeAvailable}>Available</Checkbox>
                 <Checkbox checked={SelectedFilters.NotAvailable}  onChange={onChangeNotAvailable}>Not available</Checkbox>
-                <Checkbox onChange={onChangeDiscount}>Discount</Checkbox>
+                <Checkbox checked={SelectedFilters.Discount} onChange={onChangeDiscount}>Discount</Checkbox>
             </div>
             <div className="mt-3">
                 <CategoryDropDown onItemClickCallback={ChangeCategoryWithType}></CategoryDropDown>
@@ -135,12 +163,12 @@ const Page = () => {
                     position: 'top',
                     align: 'center',
                     pageSize: 2,
-                    defaultCurrent: ActivePage,
+                    defaultCurrent: QueryActivePage,
                     onChange: (page) => {handleChangePage(page)},
                 }}
                 dataSource={FilterData}
                 split={true}
-                renderItem={(item) => <Porudct {...item} deleteProduct={HandleDeleteProduct}/>}
+                renderItem={(item) => <Porudct key={item.id} {...item} deleteProduct={HandleDeleteProduct}/>}
             >
             </List>
         </div>
