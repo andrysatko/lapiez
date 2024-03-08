@@ -1,21 +1,10 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { AntdRegistry } from '@ant-design/nextjs-registry';
-import {Avatar, Button, ConfigProvider, Layout} from "antd";
-import ProductIcon from "../../public/products-svgrepo-com.svg";
-import UsersIcon from "../../public/users-svgrepo-com.svg";
-import DeliveryIcon from "../../public/fast-food-truck-truck-svgrepo-com.svg";
-import CartIcon from "../../public/cart-shopping-svgrepo-com.svg";
-import ExistIcon from "../../public/exit-svgrepo-com.svg";
-import Image from "next/image";
 import React from "react";
-import DashboardSlider from "@/components/DashboardSlider";
 import {Comfortaa} from "@next/font/google";
-import {Header, Footer, Content} from "antd/es/layout/layout";
-import {MenuItemType} from "antd/es/menu/hooks/useItems";
-import Link from "next/link";
-import {UserOutlined} from "@ant-design/icons";
+import {AntdRegistry} from "@ant-design/nextjs-registry";
+import {ConfigProvider} from "antd";
 const confortaa = Comfortaa({
   subsets: ["latin","cyrillic","cyrillic-ext"],
 });
@@ -30,19 +19,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const items :MenuItemType[]  = [{src: ProductIcon , title : "Products", hrefPage: "products"} , {src: UsersIcon , title: "Users",  hrefPage: "user"} , {src : DeliveryIcon, title: "Delivery",  hrefPage: "delivery"}, {src: CartIcon, title: "Cart",  hrefPage: "cart"} ].map(
-      (item, index) => ({
-        key: String(index + 1),
-        icon: <div><Image src={item.src} width={20} height={20} alt={item.title}/></div>,
-        label: <Link href={`/${item.hrefPage}`}>{item.title}</Link>,
-      }),
-  );
-  const exitMenuItem = {src: ExistIcon, title: "Exit"}
-  items.push({
-    key: String(items.length + 1),
-    icon: <div><Image src={exitMenuItem.src} width={20} height={20} alt={exitMenuItem.title}/></div>,
-    label: <button>{exitMenuItem.title}</button>,
-  })
   return (
     <html lang="en">
     <body className={confortaa.className}>
@@ -73,32 +49,9 @@ export default function RootLayout({
           }
         },
       }}>
-        <Layout>
-        <DashboardSlider items={items}/>
-          <Layout>
-            {/*<Header style={{ padding: 0, background: "red", height:  90,zIndex: 998}} className="sticky top-0" />*/}
-            <Header style={{ padding: 27, background: "red", height:  90,zIndex: 998, backgroundColor: "white"}} className="sticky top-0 flex justify-end">
-              <div className="flex flex-row items-center mr-10">
-                <h3>Welcome, admin!</h3>
-                <Avatar size={32} icon={<UserOutlined />} />
-              </div>
-            </Header>
-            <Content style={{ margin: '24px 16px 0', zIndex: 950 }}>
-              <div
-                  style={{
-                    padding: 24,
-                    minHeight: 360,
-                    background: "white",
-                    borderRadius: 2,
-                  }}
-              >
                 {children}
-              </div>
-            </Content>
-          </Layout>
-        </Layout>
       </ConfigProvider>
-      </AntdRegistry>
+    </AntdRegistry>
     </body>
     </html>
   );

@@ -7,4 +7,6 @@ export const Endpoints = {
     CreateProduct : "/admin/create-product",
     UpdateProduct : "/admin/update-product",
     DeleteProduct : "/admin/delete-product",
+    AdminSignIn : "/admin/login",
+    AdminIsValidAccesstoken: "/admin/isValid_access_token"
 }

@@ -99,24 +99,27 @@ const FileUpload= ({oldImages, setFiles}: {oldImages?: Product["images"] , setFi
         };
     }
     return (
-        <>
             <Form.Item valuePropName="fileList" getValueFromEvent={normFile} required={false}>
-                {Array.from({length: 3},(_,i)=> i).map(index=>
-                    <Upload
-                        beforeUpload={() => false}
-                        listType="picture-card"
-                        fileList={filesView[index] ? [filesView[index]] : []}
-                        onPreview={handlePreview}
-                        onChange={handleChangeOne(index)}
-                    >
-                        {filesView[index] ? null : uploadButton}
-                    </Upload>
-                )}
+                <div className="flex flex-wrap">
+                    {Array.from({length: 3},(_,i)=> i).map(index=>
+                        <div style={{width: 110, height: 110}}>
+                        <Upload
+                            beforeUpload={() => false}
+                            listType="picture-card"
+                            fileList={filesView[index] ? [filesView[index]] : []}
+                            onPreview={handlePreview}
+                            onChange={handleChangeOne(index)}
+
+                        >
+                            {filesView[index] ? null : uploadButton}
+                        </Upload>
+                        </div>
+                    )}
+                </div>
             <Modal open={previewOpen} title={previewTitle} footer={null} onCancel={handleCancel}>
                 <img alt="example" style={{ width: '100%' }} src={previewImage} />
             </Modal>
-                </Form.Item>
-        </>
+            </Form.Item>
     );
 };
 

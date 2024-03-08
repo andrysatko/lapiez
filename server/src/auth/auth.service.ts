@@ -22,8 +22,8 @@ export class AuthService {
       where: { name: name },
     });
     if (admin && await bcrypt.compare(password, admin.password)) {
-      const { password,createdAt, ...result } = admin;
-      return result;
+      // const { password,createdAt, ...result } = admin;
+      // return result;
     }
     return null;
   }

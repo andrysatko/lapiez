@@ -1,11 +1,14 @@
 import {
+  BadRequestException,
   Body,
   Controller, Delete,
   FileTypeValidator,
   MaxFileSizeValidator, Optional, Param,
   ParseFilePipe,
-  Put,
-  UploadedFiles
+  Put, Req,
+  Res,
+  UploadedFiles,
+  UseGuards
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import {Post, UseInterceptors, UploadedFile} from "@nestjs/common";
@@ -19,11 +22,37 @@ import {ReferenceObject, SchemaObject} from "@nestjs/swagger/dist/interfaces/ope
 import {SchemaSwaggerUpdateProductDto, UpdateProductDto} from "./dto/UpdateProduct.dto";
 import {IsOptional} from "class-validator";
 import {UpdateTypeDto} from "./dto/UpdateType.dto";
-
+import {AdminAuthService} from "./admin_auth.service";
+import {SignDto} from "./dto/Sign.dto";
+import { JwtAuthGuard } from './guards/AtAdminAuth.guard';
+import { Public } from 'src/shared/public.decorator';
+import {response, Response} from 'express';
+@UseGuards(
+  JwtAuthGuard
+)
 @ApiTags('admin')
 @Controller('admin')
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(private readonly adminService: AdminService,private readonly adminAuthService: AdminAuthService) {}
+
+  @Public()
+  @Post('login')
+  @ApiResponse({ status: 201, description: 'Admin has been successfully logged in.'})
+  async Login(@Body() body: SignDto, @Res({ passthrough: true }) response: Response){
+    return  await this.adminAuthService.login(body.name, body.password)
+  }
+
+
+  @Public()
+  @Post('isValid_access_token')
+  async isValidToken(@Body() body: {accessToken: string}, @Res() response: Response){
+    const IsValid = await this.adminAuthService.validateAccessToken(body.accessToken);
+    if(!IsValid){
+      throw new BadRequestException("Invalid token");
+    }
+    response.statusCode = 200;
+    return response.json({message: "Valid token"});
+  }
 
   @Post('create-product')
   @ApiConsumes('multipart/form-data')

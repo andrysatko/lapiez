@@ -7,13 +7,7 @@ import DashboardImage from "../../public/layer groupdashboard.svg";
 import {Divider, Menu, theme} from "antd";
 import Sider from "antd/es/layout/Sider";
 import useWindowDimensions from "@/hook/useWindowDimensions";
-import ProductIcon from "../../public/products-svgrepo-com.svg";
-import UsersIcon from "../../public/users-svgrepo-com.svg";
-import DeliveryIcon from "../../public/fast-food-truck-truck-svgrepo-com.svg";
-import CartIcon from "../../public/cart-shopping-svgrepo-com.svg";
-import ExistIcon from "../../public/exit-svgrepo-com.svg";
 import {MenuItemType} from "antd/es/menu/hooks/useItems";
-import Link from "next/link";
 
 const DashboardSlider = ({items}:{items:MenuItemType[] }) => {
     const { height, width } = useWindowDimensions();

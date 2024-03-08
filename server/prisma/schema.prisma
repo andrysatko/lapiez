@@ -125,5 +125,4 @@ model Admin {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   name      String   @unique
   password  String
-  createdAt DateTime @default(now())
 }

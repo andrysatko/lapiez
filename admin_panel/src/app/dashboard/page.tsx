@@ -26,6 +26,8 @@ export default function Home() {
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
+
+
   return (
       <main className={confortaa.className}>
       </main>

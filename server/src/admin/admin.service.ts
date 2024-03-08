@@ -10,6 +10,7 @@ import {PrismaService} from "../database/prisma.service";
 import {Prisma} from "@prisma/client";
 import {UpdateCategoryDto} from "./dto/UpdateCategory.dto";
 import {UpdateTypeDto} from "./dto/UpdateType.dto";
+import * as process from "process";
 
 @Injectable()
 export class AdminService {

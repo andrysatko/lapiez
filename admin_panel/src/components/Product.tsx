@@ -84,7 +84,7 @@ export default function Porudct ({ deleteProduct,...product}: Product & {deleteP
                 <h2 className="font-semibold text-sm">Type: <span className="text-orange text-xs">{type?.title ?? "NULL"}</span> , type_id: <span className="text-orange text-xs"> {typeId ?? "NULL"}</span></h2>
             </Flex>
             <Flex style={{paddingTop:20}} gap="large" wrap="wrap">
-                <Link href={`/products/edit/${id}`}>
+                <Link href={`products/edit/${id}`}>
                     <Button
                         icon={<div className="w-5 h-4">
                             <NImage src={EditIcon} alt="edit"/>
