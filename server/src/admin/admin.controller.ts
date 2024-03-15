@@ -46,6 +46,9 @@ export class AdminController {
   @Public()
   @Post('isValid_access_token')
   async isValidToken(@Body() body: {accessToken: string}, @Res() response: Response){
+    if(!body.accessToken){
+      throw new BadRequestException("Token is required");
+    }
     const IsValid = await this.adminAuthService.validateAccessToken(body.accessToken);
     if(!IsValid){
       throw new BadRequestException("Invalid token");

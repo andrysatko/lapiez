@@ -1,20 +1,22 @@
 'use client'
 import React, {useEffect, useState} from 'react';
-import {Button, Dropdown, MenuProps, Space} from "antd";
+import {Button, Dropdown, MenuProps, Space,Divider} from "antd";
 import {DownOutlined} from "@ant-design/icons";
 import {Endpoints, host} from "@/constants";
 import {AllCategories} from "@/types";
 
 type SelectedItem = {id:string, title: string}
-const CategoryDropDown: React.FC<{onItemClickCallback: (categoryId: string , typeId: string  | null)=> void, defaultValues?: {categoryId:string , typeId:string| null}}> = ({onItemClickCallback,defaultValues}) => {
+const CategoryDropDown: React.FC<{
+    onItemClickCallback: (categoryId: string , typeId: string  | null)=> void,
+    defaultValues?: {categoryId:string , typeId:string| null},
+    pushEndItems: any}>
+    = ({onItemClickCallback,defaultValues}) => {
     const [ActiveCategory, setActiveCategory] = useState<SelectedItem>()
     const [ActiveType, setActiveType] = useState<SelectedItem| null>()
     const [categoryData , setCategoryData] = useState<MenuProps['items']>([])
-
     useEffect(()=> {
         fetch(host + Endpoints.CategoriesAndTypes).then(response => response.json()).then((data: AllCategories) => {
             if(data.length > 0){
-                console.log(data)
                 const Items: MenuProps['items'] = []
                 data.forEach((item, index) => {
                     if(defaultValues && item.id === defaultValues.categoryId){
@@ -48,9 +50,18 @@ const CategoryDropDown: React.FC<{onItemClickCallback: (categoryId: string , typ
             }
         })
     },[defaultValues])
-
     return (
-        <Dropdown menu={ {items: categoryData}} trigger={['click']}>
+        <Dropdown menu={ {items: categoryData}}
+                  dropdownRender={(menu) => (
+                      <div style={contentStyle}>
+                          {React.cloneElement(menu as any, { style: menuStyle })}
+                          <Divider style={{ margin: 0 }} />
+                          <Space style={{ padding: 8 }}>
+                              <Button type="primary">Click me!</Button>
+                          </Space>
+                      </div>
+                  )}
+                  trigger={['click']}>
             <Button>
                 <Space>
                     Category:({ActiveCategory?.title}) <pre/>Type:({ActiveType?.title})

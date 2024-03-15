@@ -16,7 +16,7 @@ const DashboardSlider = ({items}:{items:MenuItemType[] }) => {
     } = theme.useToken();
 
     return (
-            <Sider collapsible width={CountSiderWidth(width)} style={{ background: colorBgContainer , height: "100%", position: "fixed", zIndex: 999, top: 0, left: 0, backgroundColor: "#fff7ec"}}
+            <Sider collapsible width={CountSiderWidth(width)} style={{ background: colorBgContainer , height: "100%", position: "fixed", zIndex: 999, top: 0, left: 0, backgroundColor: "rgba(241,241,241,0.97)"}}
                    breakpoint="lg"
                    collapsedWidth="0"
             >
